@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MateSolver — Risolvi Problemi Passo per Passo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="window._katexReady=true"></script>
+<style>
+:root{
+  --bg:#0b0c0e;--bg2:#111215;--surface:#15171b;--surface2:#1c1f26;
+  --border:#252830;--border2:#2f3340;
+  --accent:#e8c547;--accent2:#5b8af0;--green:#4ade80;--red:#f87171;
+  --text:#e2e4ea;--muted:#636878;--muted2:#8b91a0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;}
+
+/* SETUP */
+#screen-setup{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;}
+.setup-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:40px;width:460px;max-width:95vw;}
+.setup-logo{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--accent);letter-spacing:-.02em;margin-bottom:4px;}
+.setup-logo span{color:var(--text);}
+.setup-desc{font-size:.82rem;color:var(--muted2);margin-bottom:28px;line-height:1.5;}
+.setup-label{font-size:.65rem;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px;}
+.provider-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.prov-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--muted2);font-family:'DM Mono',monospace;font-size:.75rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;}
+.prov-btn:hover{border-color:var(--border2);color:var(--text);}
+.prov-btn.active{background:#1a1d26;border-color:var(--accent);color:var(--accent);}
+.prov-info{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:.75rem;line-height:1.6;}
+.prov-model{color:var(--accent);font-family:'DM Mono',monospace;font-size:.65rem;font-weight:700;}
+.prov-link{color:var(--muted2);}
+.prov-link a{color:var(--accent2);text-decoration:none;}
+.api-input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:.82rem;padding:11px 14px;border-radius:8px;outline:none;transition:border-color .15s;margin-bottom:8px;}
+.api-input:focus{border-color:var(--accent2);}
+.api-input::placeholder{color:var(--muted);}
+.save-row{display:flex;align-items:center;gap:8px;margin-bottom:20px;font-size:.75rem;color:var(--muted2);}
+.save-row input[type=checkbox]{accent-color:var(--accent);cursor:pointer;}
+.start-btn{width:100%;background:var(--accent);color:#0b0c0e;border:none;border-radius:8px;padding:13px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.95rem;cursor:pointer;transition:background .15s;}
+.start-btn:hover{background:#f0d060;}
+
+/* MAIN */
+#screen-main{display:none;grid-template-columns:240px 1fr 370px;grid-template-rows:52px 1fr;height:100vh;}
+#screen-main.visible{display:grid;}
+
+/* TOPBAR */
+.topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;}
+.topbar-logo{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--accent);letter-spacing:-.02em;}
+.topbar-logo span{color:var(--text);}
+.topbar-tag{font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace;}
+.topbar-tabs{display:flex;gap:4px;margin-left:auto;}
+.tab-btn{background:none;border:1px solid transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.78rem;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .15s;}
+.tab-btn.active{background:var(--surface2);border-color:var(--border);color:var(--text);}
+.tab-btn:hover:not(.active){color:var(--text);}
+.prov-badge{font-size:.65rem;font-family:'DM Mono',monospace;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--muted2);cursor:pointer;transition:all .15s;}
+.prov-badge:hover{border-color:var(--accent);color:var(--accent);}
+
+/* SIDEBAR */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:14px 10px;}
+.side-title{font-size:.6rem;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:0 8px 8px;margin-top:4px;}
+.topic-btn{width:100%;text-align:left;background:none;border:none;color:var(--muted2);font-family:'DM Sans',sans-serif;font-size:.8rem;padding:7px 10px;border-radius:6px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;line-height:1.3;}
+.topic-btn:hover{background:var(--surface2);color:var(--text);}
+.topic-btn.active{background:var(--surface2);color:var(--accent);}
+.topic-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:background .15s;}
+.topic-btn.active .topic-dot{background:var(--accent);}
+.side-div{border:none;border-top:1px solid var(--border);margin:8px 0;}
+
+/* MAIN AREA */
+.main-area{display:flex;flex-direction:column;overflow:hidden;}
+.panel{display:none;flex-direction:column;height:100%;overflow:hidden;}
+.panel.active{display:flex;}
+
+/* CHAT */
+.chat-scroll{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:0;}
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:10px;color:var(--muted);}
+.welcome-icon{font-size:2.5rem;margin-bottom:4px;}
+.welcome h2{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--text);font-weight:400;}
+.welcome p{font-size:.82rem;max-width:380px;line-height:1.6;}
+.welcome code{font-family:'DM Mono',monospace;color:var(--accent2);font-size:.76rem;}
+.msgs{display:flex;flex-direction:column;gap:18px;}
+.msg{display:flex;flex-direction:column;gap:5px;}
+.msg-label{font-size:.6rem;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+.msg.user .msg-label{color:var(--accent2);}
+.bubble{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:13px 15px;font-size:.86rem;line-height:1.75;}
+.msg.user .bubble{background:#141b2e;border-color:#1f2f50;font-family:'DM Mono',monospace;font-size:.78rem;}
+.step{border-left:2px solid var(--accent);padding:8px 12px;margin:10px 0;background:rgba(232,197,71,.05);border-radius:0 6px 6px 0;}
+.step-n{font-size:.6rem;font-family:'DM Mono',monospace;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.result-box{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:10px 14px;margin-top:10px;font-family:'DM Mono',monospace;font-size:.82rem;color:var(--green);}
+.error-box{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:10px 14px;margin-top:6px;font-size:.82rem;color:var(--red);}
+.bubble .katex-display{margin:10px 0;overflow-x:auto;}
+.bubble .katex{font-size:1em;}
+.typing{display:flex;gap:4px;align-items:center;padding:4px 0;}
+.dot{width:5px;height:5px;background:var(--muted);border-radius:50%;animation:bop 1.2s infinite;}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+
+/* INPUT */
+.input-bar{border-top:1px solid var(--border);padding:14px 24px;background:var(--surface);display:flex;flex-direction:column;gap:8px;}
+.topic-hint{font-size:.68rem;font-family:'DM Mono',monospace;color:var(--muted);}
+.topic-hint b{color:var(--accent);}
+.input-row{display:flex;gap:8px;align-items:flex-end;}
+.problem-input{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:.83rem;padding:11px 13px;border-radius:8px;resize:none;min-height:44px;max-height:120px;outline:none;transition:border-color .15s;line-height:1.5;}
+.problem-input:focus{border-color:var(--accent2);}
+.problem-input::placeholder{color:var(--muted);}
+.send-btn{background:var(--accent);color:#0b0c0e;border:none;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.82rem;padding:11px 18px;border-radius:8px;cursor:pointer;transition:background .15s;white-space:nowrap;height:44px;}
+.send-btn:hover{background:#f0d060;}
+.send-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+
+/* NOTES */
+.notes-scroll{flex:1;overflow-y:auto;padding:22px 26px;}
+.notes-title{font-family:'DM Serif Display',serif;font-size:1.35rem;font-weight:400;margin-bottom:3px;}
+.notes-sub{font-size:.75rem;color:var(--muted2);margin-bottom:22px;}
+.note-sec{margin-bottom:26px;}
+.note-sec-title{font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.note-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:13px 15px;margin-bottom:8px;font-size:.83rem;line-height:1.8;}
+.note-card p{margin-bottom:5px;}
+.note-card p:last-child{margin-bottom:0;}
+
+/* GEOGEBRA */
+.geo-panel{border-left:1px solid var(--border);display:flex;flex-direction:column;background:var(--surface);}
+.geo-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.geo-title{font-size:.7rem;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.geo-btn{margin-left:auto;background:var(--surface2);border:1px solid var(--border);color:var(--muted2);font-family:'DM Sans',sans-serif;font-size:.72rem;padding:5px 10px;border-radius:5px;cursor:pointer;transition:all .15s;}
+.geo-btn:hover{color:var(--text);border-color:var(--accent2);}
+#geo-frame{flex:1;border:none;background:#fff;}
+
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px;}
+@media(max-width:950px){#screen-main{grid-template-columns:1fr 320px;}.sidebar{display:none;}}
+@media(max-width:640px){#screen-main{grid-template-columns:1fr;}.geo-panel{display:none;}}
+</style>
+</head>
+<body>
+
+<!-- ══ SETUP ══ -->
+<div id="screen-setup">
+  <div class="setup-card">
+    <div class="setup-logo">Mate<span>Solver</span></div>
+    <div class="setup-desc">Risolve problemi di matematica passo per passo usando i tuoi appunti.<br>Scegli un provider AI e inserisci la tua API key per iniziare.</div>
+    <div class="setup-label">Provider AI</div>
+    <div class="provider-row">
+      <button class="prov-btn active" id="tab-groq"      onclick="selectProvider('groq')">⚡ Groq (Gratis)</button>
+      <button class="prov-btn"        id="tab-anthropic" onclick="selectProvider('anthropic')">🟠 Anthropic</button>
+      <button class="prov-btn"        id="tab-openai"    onclick="selectProvider('openai')">🟢 OpenAI</button>
+      <button class="prov-btn"        id="tab-gemini"    onclick="selectProvider('gemini')">🔵 Gemini</button>
+    </div>
+    <div class="prov-info">
+      <div class="prov-model" id="prov-model"></div>
+      <div class="prov-link"  id="prov-link"></div>
+    </div>
+    <div class="setup-label">API Key</div>
+    <input class="api-input" id="api-key-input" type="password" placeholder="" autocomplete="off">
+    <div class="save-row">
+      <input type="checkbox" id="save-key-cb" checked>
+      <label for="save-key-cb">Salva la API key nel browser (localStorage)</label>
+    </div>
+    <button class="start-btn" onclick="startApp()">Inizia →</button>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div id="screen-main">
+  <header class="topbar">
+    <div class="topbar-logo">Mate<span>Solver</span></div>
+    <div class="topbar-tag">analisi · limiti · studio di funzione</div>
+    <div class="topbar-tabs">
+      <button class="tab-btn active" onclick="switchPanel('solver',this)">⚡ Risolvi</button>
+      <button class="tab-btn"        onclick="switchPanel('notes',this)">📖 Appunti</button>
+    </div>
+    <div class="prov-badge" id="prov-badge" onclick="document.getElementById('screen-setup').style.display='flex'" title="Cambia provider / API key"></div>
+  </header>
+
+  <nav class="sidebar">
+    <div class="side-title">Argomenti</div>
+    <button class="topic-btn" onclick="selectTopic(this,'Intervalli e Intorni')"><span class="topic-dot"></span>Intervalli e Intorni</button>
+    <button class="topic-btn" onclick="selectTopic(this,'Limiti Immediati')"><span class="topic-dot"></span>Limiti Immediati</button>
+    <button class="topic-btn" onclick="selectTopic(this,'Limiti 0/0 — Fattorizzazione')"><span class="topic-dot"></span>Limiti 0/0 — Fattorizzazione</button>
+    <button class="topic-btn" onclick="selectTopic(this,'Limiti Notevoli')"><span class="topic-dot"></span>Limiti Notevoli</button>
+    <button class="topic-btn" onclick="selectTopic(this,'Funzioni Continue')"><span class="topic-dot"></span>Funzioni Continue</button>
+    <hr class="side-div">
+    <div class="side-title">Studio di Funzione</div>
+    <button class="topic-btn" onclick="selectTopic(this,'Dominio')"><span class="topic-dot"></span>1. Dominio</button>
+    <button class="topic-btn" onclick="selectTopic(this,'Intersezioni con gli Assi')"><span class="topic-dot"></span>2. Intersezioni Assi</button>
+    <button class="topic-btn" onclick="selectTopic(this,'Studio del Segno')"><span class="topic-dot"></span>3. Studio del Segno</button>
+    <button class="topic-btn" onclick="selectTopic(this,'Simmetrie')"><span class="topic-dot"></span>4. Simmetrie</button>
+    <button class="topic-btn" onclick="selectTopic(this,'Asintoti Verticali')"><span class="topic-dot"></span>5. Asintoti Verticali</button>
+    <button class="topic-btn" onclick="selectTopic(this,'Asintoto Obliquo / Orizzontale')"><span class="topic-dot"></span>6. Asintoti</button>
+    <button class="topic-btn" onclick="selectTopic(this,'FARF Completo')"><span class="topic-dot"></span>FARF Completo</button>
+  </nav>
+
+  <main class="main-area">
+    <div id="panel-solver" class="panel active">
+      <div class="chat-scroll" id="chat-scroll">
+        <div class="welcome" id="welcome">
+          <div class="welcome-icon">∫</div>
+          <h2>Scrivi un problema</h2>
+          <p>Risolvo passo per passo senza saltare nessuno step, usando i tuoi appunti di analisi.</p>
+          <p style="margin-top:6px"><code>⚡ Groq è gratis — ottieni la chiave su console.groq.com</code></p>
+        </div>
+        <div class="msgs" id="msgs"></div>
+      </div>
+      <div class="input-bar">
+        <div class="topic-hint" id="topic-hint">Nessun argomento selezionato</div>
+        <div class="input-row">
+          <textarea class="problem-input" id="problem-input"
+            placeholder="Es: lim(x→1) (x²-1)/(2x²-x-1)  oppure  studia f(x)=(x³-3x²-x+3)/(x²-2x)..."
+            rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="send-btn" id="send-btn" onclick="sendProblem()">Risolvi →</button>
+        </div>
+      </div>
+    </div>
+    <div id="panel-notes" class="panel">
+      <div class="notes-scroll" id="notes-content">
+        <div class="notes-title">Seleziona un argomento</div>
+        <div class="notes-sub">Clicca un argomento nella barra laterale per vedere gli appunti scritti a mano.</div>
+      </div>
+    </div>
+  </main>
+
+  <aside class="geo-panel">
+    <div class="geo-header">
+      <span class="geo-title">📐 GeoGebra Classic</span>
+      <button class="geo-btn" onclick="injectLastFunction()">Grafica ultima funzione</button>
+    </div>
+    <iframe id="geo-frame" src="https://www.geogebra.org/classic?lang=it" allowfullscreen></iframe>
+  </aside>
+</div>
+
+<script>
+// ═══ PROVIDERS — same pattern as Law game ═══
+const PROVIDERS={
+  groq:     {name:'Groq',         model:'llama-3.3-70b-versatile', placeholder:'gsk_...',    link:'console.groq.com',      url:'https://console.groq.com/keys'},
+  anthropic:{name:'Anthropic',    model:'claude-sonnet-4-20250514',placeholder:'sk-ant-...',link:'console.anthropic.com', url:'https://console.anthropic.com'},
+  openai:   {name:'OpenAI',       model:'gpt-4o',                  placeholder:'sk-...',     link:'platform.openai.com',   url:'https://platform.openai.com/api-keys'},
+  gemini:   {name:'Google Gemini',model:'gemini-1.5-pro',          placeholder:'AIza...',    link:'aistudio.google.com',   url:'https://aistudio.google.com/app/apikey'},
+};
+let provider='groq', apiKey='', currentTopic=null, chatHistory=[], lastFunction=null;
+
+function selectProvider(p){
+  provider=p;
+  document.querySelectorAll('.prov-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+p).classList.add('active');
+  const info=PROVIDERS[p];
+  document.getElementById('prov-model').textContent='Modello: '+info.model;
+  document.getElementById('prov-link').innerHTML='Ottieni la chiave su <a href="'+info.url+'" target="_blank">'+info.link+'</a>';
+  document.getElementById('api-key-input').placeholder=info.placeholder;
+}
+
+// ═══ callAI — all 4 providers (copied from Law game) ═══
+async function callAI(msgs,systemPrompt,maxTokens){
+  const p=PROVIDERS[provider];
+  if(provider==='anthropic'){
+    const body={model:p.model,max_tokens:maxTokens,messages:msgs};
+    if(systemPrompt)body.system=systemPrompt;
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
+    const d=await r.json();if(d.error)throw new Error(d.error.message);
+    if(d.stop_reason==='max_tokens')throw new Error('Risposta troncata. Riprova.');
+    return d.content?.find(b=>b.type==='text')?.text||'';
+  }
+  if(provider==='openai'){
+    const ms=systemPrompt?[{role:'system',content:systemPrompt},...msgs]:msgs;
+    const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:p.model,max_tokens:maxTokens,messages:ms})});
+    const d=await r.json();if(d.error)throw new Error(d.error.message);
+    return d.choices?.[0]?.message?.content||'';
+  }
+  if(provider==='gemini'){
+    const parts=[];if(systemPrompt)parts.push({text:'SYSTEM: '+systemPrompt+'\n\n'});
+    msgs.forEach(m=>parts.push({text:(m.role==='user'?'USER: ':'ASSISTANT: ')+m.content+'\n'}));
+    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+p.model+':generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts}],generationConfig:{maxOutputTokens:maxTokens}})});
+    const d=await r.json();if(d.error)throw new Error(d.error.message);
+    return d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+  }
+  if(provider==='groq'){
+    const ms=systemPrompt?[{role:'system',content:systemPrompt},...msgs]:msgs;
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:p.model,max_tokens:maxTokens,messages:ms})});
+    const d=await r.json();if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
+    return d.choices?.[0]?.message?.content||'';
+  }
+  throw new Error('Provider sconosciuto');
+}
+
+// ═══ SYSTEM PROMPT — full notes from all handwritten PDFs ═══
+function buildSystemPrompt(){
+  const topicCtx=currentTopic?'\n\nL\'utente ha selezionato il topic: **'+currentTopic+'**. Concentra la risposta su questo argomento specifico.':'';
+  return `Sei MateSolver, un tutor di matematica per un 5° anno di scuola superiore italiana (Analisi — Maturità).
+Hai i seguenti appunti scritti a mano dallo studente (letti dai PDF originali):
+
+═══ APPUNTI (da PDF 214, 221, 226, 241, 246, 255, 270, 275, 283, 292) ═══
+
+▸ INTERVALLI (PDF 241)
+• [a;b] chiuso | ]a;b[ aperto | [a;b[ e ]a;b] semi-aperti
+• [a;+∞[, ]-∞;b], ℝ=]-∞;+∞[
+
+▸ INTORNI DI UN PUNTO (PDF 214, 241)
+• I(x₀) = ]x₀-δ₁ ; x₀+δ₂[  (intorno completo, δ₁≠δ₂)
+• δ₁=δ₂=δ → intorno circolare ]x₀-δ ; x₀+δ[
+• Intorno destro:  I⁺(x₀) = ]x₀ ; x₀+δ[
+• Intorno sinistro: I⁻(x₀) = ]x₀-δ ; x₀[
+• Es: I(2)=]0;7[  con δ₁=2, δ₂=5
+
+▸ LIMITI IMMEDIATI (PDF 246)
+• Sostituzione diretta se f è continua in x₀
+• lim(x→4) √x·(x²-15) = √4·(16-15) = 2(1) = 2
+• lim(x→3) 2(x²+1) = 2(10) = 20
+• lim(x→1) (x+1)/(x²-2x+1) = 2/0 = ∞ (denominatore zero)
+• Limiti all'∞: raccogliere xⁿ al num. e den.; costante/xⁿ → 0
+• Forma ∞/∞: lim -x³(x⁴-ax²) = lim -x⁷+ax⁵ = -∞ (grado 7 domina)
+
+▸ LIMITI FORMA 0/0 — FATTORIZZAZIONE (PDF 255)
+• Identità fondamentali (NB negli appunti):
+  A²-B² = (A+B)(A-B)                    [differenza quadrati]
+  A²±2AB+B² = (A±B)²                    [quadrato binomio]
+  A²+B²+C²±2AB±2AC±2BC = (A±B±C)²      [quadrato trinomio]
+• Procedura:
+  1. Sostituire x=x₀ → verificare 0/0
+  2. Fattorizzare NUM (Ruffini se radice intera, o identità)
+  3. Fattorizzare DEN
+  4. Cancellare fattore comune (x-x₀)
+  5. Sostituire di nuovo
+• Esempio dagli appunti (PDF 255):
+  lim(x→1) (x²-1)/(2x²-x-1)
+  NUM: x²-1=(x-1)(x+1)
+  DEN: P(1)=2-1-1=0 → Ruffini con x=1 → (2x+1)(x-1)
+  Risultato: (1+1)/(2+1) = 2/3
+• Secondo esempio (PDF 255):
+  lim(x→2) (x³-2x²+x-2)/(x²+x-6)
+  NUM: x²(x-2)+1(x-2)=(x-2)(x²+1)
+  DEN: (x-2)(x+3)
+  Risultato: (4+1)/(2+3) = 5/5 = 1
+
+▸ LIMITI NOTEVOLI (PDF 270)
+• 5 limiti fondamentali:
+  1. lim(x→0) sin(x)/x = 1
+  2. lim(x→0) (1-cos x)/x = 0
+  3. lim(x→0) (1-cos x)/x² = 1/2
+  4. lim(x→0) ln(1+x)/x = 1
+  5. lim(x→0) (eˣ-1)/x = 1
+• Tecnica: moltiplicare/dividere per adattare la forma
+  lim(x→0) ln(1+x)/sin(3x) = [ln(1+x)/x]·[x/sin(3x)] = 1·(1/3) = 1/3
+  lim(x→0) (1-e^2x)/sin(x) = -lim[(e^2x-1)/2x]·2·[x/sinx] = -1·2·1 = -2
+  lim(x→0) 9ln(1+2x)/sin(3x)·3x = lim 3[ln(1+2x)/2x]·2 = 6
+
+▸ FUNZIONI CONTINUE (PDF 283)
+• f continua in x₀ ⟺ lim(x→x₀) f(x) = f(x₀)
+• Es: y=1-x⁴, x₀=2 → lim(x→2)(1-x⁴) = 1-16 = -15 = f(2) ✓ continua
+• Esempio discontinuità (PDF 283):
+  y = {x³ se x<1, x+2 se x≥1}
+  lim(x→1⁻) x³ = 1  ≠  3 = lim(x→1⁺)(x+2)  → NON continua in x₀=1
+• f è continua su [a;b] se è continua in tutti i punti dell'intervallo
+
+▸ STUDIO DI FUNZIONE — F.A.R.F (PDF 221, 226, 275, 292)
+SCHEMA IN 6 PASSI (+ grafico):
+
+PASSO 1 — DOMINIO
+  Funzione razionale: denominatore ≠ 0
+  Esempio (PDF 292): y=(x³-3x²-x+3)/(x²-2x)
+    x²-2x≠0 → x(x-2)≠0 → x≠0, x≠2
+    D: ∀x∈ℝ\{0;2}
+  Esempio (PDF 221): y=(x²-3x+2)/x²
+    x²≠0 → x≠0
+    D: ∀x∈ℝ\{0}
+  Esempio (PDF 226): y=(2x-1)/(x(x²-4))
+    x(x-2)(x+2)≠0 → x≠0, x≠±2
+    D: ∀x∈ℝ\{-2;0;2}
+  Esempio (PDF 275): y=(4x+3)/(x-1)
+    x≠1 → D: ∀x∈ℝ\{1}
+
+PASSO 2 — INTERSEZIONI ASSI
+  ∩x: y=0 → risolvere numeratore=0 (con x∈D)
+  ∩y: x=0 → calcolare f(0) SOLO SE 0∈D
+  Esempio (PDF 292):
+    NUM: x³-3x²-x+3=(x-3)(x-1)(x+1)=0 → x=3,1,-1
+    ∩x: A(3;0), B(1;0), C(-1;0)
+    ∩y: x=0∉D → nessuna intersezione con asse y
+  Esempio (PDF 275): y=(4x+3)/(x-1)
+    ∩x: 4x+3=0 → x=-3/4 → A(-3/4;0)
+    ∩y: f(0)=-3 → B(0;-3)
+  Esempio (PDF 221): y=(x²-3x+2)/x²
+    ∩x: x²-3x+2=0 → (x-2)(x-1)=0 → A(2;0), B(1;0)
+    ∩y: x=0∉D → nessuna
+
+PASSO 3 — STUDIO DEL SEGNO
+  Trovare dove y≥0: separare num e den, trovare valori critici, tabella
+  Esempio (PDF 292): fattori num=(x+1)(x-1)(x-3), den=x(x-2)
+    Valori critici: -1, 0, 1, 2, 3
+    Tabella: + per x∈]-∞;-1[ ∪ ]0;1[ ∪ ]2;3[... (dalla tabella dei segni)
+
+PASSO 4 — SIMMETRIE
+  Pari: f(-x)=f(x)   → simmetria rispetto asse y
+  Dispari: f(-x)=-f(x) → simmetria rispetto all'origine
+  Esempio (PDF 275): f(-x)=(-4x+3)/(-x-1) ≠ f(x) e ≠ -f(x) → né pari né dispari
+
+PASSO 5 — ASINTOTI VERTICALI (A.V.)
+  x=c è A.V. se lim(x→c)f(x)=±∞ (almeno un limite laterale infinito)
+  Esempio (PDF 292):
+    lim(x→0⁺)f(x)=-∞, lim(x→0⁻)f(x)=+∞  → A.V.: x=0
+    lim(x→2⁺)f(x)=-∞, lim(x→2⁻)f(x)=+∞  → A.V.: x=2
+  NB: calcolare il segno del limite con i fattori già trovati
+
+PASSO 6 — ASINTOTI ORIZZONTALI / OBLIQUI
+  A.O. y=L: se lim(x→±∞)f(x)=L (finito)
+  A.Obl. y=mx+q (quando lim=∞):
+    m = lim(x→±∞) f(x)/x
+    q = lim(x→±∞) [f(x) - m·x]
+  Esempio (PDF 292):
+    lim(x→±∞) (x³-3x²-x+3)/(x²-2x) = ∞/∞ → raccogliere x²
+    m = lim(x³-3x²-x+3)/(x³-2x²) = 1    [confronto gradi]
+    q = lim[(x³-3x²-x+3)/(x²-2x) - x]
+      = lim(x³-3x²-x+3-x³+2x²)/(x²-2x)
+      = lim(-5x²-x+3)/(x²-2x) = -5
+    → A.Obl.: y = x-5
+  Esempio (PDF 275): y=(4x+3)/(x-1)
+    lim(x→±∞) = 4 → A.O.: y=4
+
+═══════════════════════════════════════════
+
+REGOLE PER RISPONDERE:
+1. NON saltare mai nessuno step — ogni passaggio deve essere esplicitato
+2. Usa LaTeX: \\(...\\) per formule inline, \\[...\\] per display
+3. Formatta ogni passo come: **Passo N — [nome]:**
+4. Spiega il ragionamento PRIMA del calcolo
+5. Scrivi il risultato finale come: **Risultato: ...**
+6. Se la funzione è graficabile, scrivi alla fine: "Puoi graficare su GeoGebra: f(x)=[formula]"
+7. Lingua: italiano${topicCtx}`;
+}
+
+// ═══ SETUP & START ═══
+const STORAGE_KEY='matesolver_v1';
+window.onload=function(){
+  try{
+    const s=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    if(s.provider)provider=s.provider;
+    if(s.apiKey){apiKey=s.apiKey;document.getElementById('api-key-input').value=apiKey;}
+  }catch(e){}
+  selectProvider(provider);
+  if(apiKey)launchMain();
+};
+
+function startApp(){
+  const k=document.getElementById('api-key-input').value.trim();
+  if(!k){alert('Inserisci la tua API key.');return;}
+  apiKey=k;
+  if(document.getElementById('save-key-cb').checked){
+    try{localStorage.setItem(STORAGE_KEY,JSON.stringify({provider,apiKey}));}catch(e){}
+  }
+  launchMain();
+}
+
+function launchMain(){
+  document.getElementById('screen-setup').style.display='none';
+  const m=document.getElementById('screen-main');
+  m.classList.add('visible');
+  document.getElementById('prov-badge').textContent=PROVIDERS[provider].name+' · '+PROVIDERS[provider].model;
+}
+
+// ═══ UI HELPERS ═══
+function switchPanel(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+}
+
+function selectTopic(btn,topic){
+  document.querySelectorAll('.topic-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentTopic=topic;
+  document.getElementById('topic-hint').innerHTML='Argomento: <b>'+topic+'</b>';
+  renderNotes(topic);
+}
+
+// ═══ NOTES ═══
+const NOTES={
+  'Intervalli e Intorni':[
+    {t:'Tipi di Intervalli',b:`<p>\\([a;b]\\) — chiuso (estremi inclusi ●)</p><p>\\(]a;b[\\) — aperto (estremi esclusi ○)</p><p>\\([a;b[\\) e \\(]a;b]\\) — semi-aperti</p><p>\\([a;+\\infty[\\), \\(]-\\infty;b]\\), \\(\\mathbb{R}=]-\\infty;+\\infty[\\)</p>`},
+    {t:'Intorno di x₀',b:`<p>\\(I(x_0)=]x_0-\\delta_1;x_0+\\delta_2[\\) — completo</p><p>\\(\\delta_1=\\delta_2\\) → intorno circolare</p><p>\\(I^+(x_0)=]x_0;x_0+\\delta[\\) — destro</p><p>\\(I^-(x_0)=]x_0-\\delta;x_0[\\) — sinistro</p>`}
+  ],
+  'Limiti Immediati':[
+    {t:'Sostituzione Diretta',b:`<p>\\(\\lim_{x\\to4}\\sqrt{x}(x^2-15)=2(1)=2\\)</p><p>\\(\\lim_{x\\to3}2(x^2+1)=20\\)</p><p>\\(\\lim_{x\\to-\\infty}\\frac{-2}{x^4}=0\\)</p>`},
+    {t:'Infinito — Raccogliere xⁿ',b:`<p>Raccogliere la potenza max di \\(x\\) al num. e den.</p><p>\\(\\frac{\\text{costante}}{x^n}\\to0\\) per \\(x\\to\\pm\\infty\\)</p>`}
+  ],
+  'Limiti 0/0 — Fattorizzazione':[
+    {t:'Identità (NB dagli appunti)',b:`<p>\\(A^2-B^2=(A+B)(A-B)\\)</p><p>\\(A^2\\pm2AB+B^2=(A\\pm B)^2\\)</p><p>\\(A^2+B^2+C^2\\pm2AB\\pm2AC\\pm2BC=(A\\pm B\\pm C)^2\\)</p>`},
+    {t:'Procedura 0/0',b:`<p>1. Sostituire → ottenere \\(\\tfrac{0}{0}\\)</p><p>2. Fattorizzare NUM (Ruffini / identità)</p><p>3. Fattorizzare DEN</p><p>4. Semplificare \\((x-x_0)\\)</p><p>5. Sostituire di nuovo</p><p style="margin-top:8px">Es: \\(\\lim_{x\\to1}\\frac{x^2-1}{2x^2-x-1}=\\frac{(x-1)(x+1)}{(2x+1)(x-1)}=\\frac{2}{3}\\)</p>`}
+  ],
+  'Limiti Notevoli':[
+    {t:'I 5 Limiti (PDF 270)',b:`<p>1. \\(\\lim_{x\\to0}\\frac{\\sin x}{x}=1\\)</p><p>2. \\(\\lim_{x\\to0}\\frac{1-\\cos x}{x}=0\\)</p><p>3. \\(\\lim_{x\\to0}\\frac{1-\\cos x}{x^2}=\\frac{1}{2}\\)</p><p>4. \\(\\lim_{x\\to0}\\frac{\\ln(1+x)}{x}=1\\)</p><p>5. \\(\\lim_{x\\to0}\\frac{e^x-1}{x}=1\\)</p>`},
+    {t:'Tecnica di Riconduzione',b:`<p>\\(\\lim_{x\\to0}\\frac{\\ln(1+x)}{\\sin3x}=\\frac{\\ln(1+x)}{x}\\cdot\\frac{x}{\\sin3x}=\\frac{1}{3}\\)</p><p>\\(\\lim_{x\\to0}\\frac{1-e^{2x}}{\\sin x}=-2\\)</p>`}
+  ],
+  'Funzioni Continue':[
+    {t:'Definizione',b:`<p>\\(f\\) continua in \\(x_0\\) se \\(\\lim_{x\\to x_0}f(x)=f(x_0)\\)</p>`},
+    {t:'Esempio Discontinuità',b:`<p>\\(y=\\begin{cases}x^3&x<1\\\\x+2&x\\geq1\\end{cases}\\)</p><p>\\(\\lim_{x\\to1^-}x^3=1\\neq3=\\lim_{x\\to1^+}(x+2)\\) → non continua</p>`}
+  ],
+  'Dominio':[{t:'Regole',b:`<p>Funzione razionale: DEN \\(\\neq0\\)</p><p>Es (PDF 292): \\(x^2-2x\\neq0\\Rightarrow D:\\mathbb{R}\\setminus\\{0;2\\}\\)</p>`}],
+  'Intersezioni con gli Assi':[{t:'Procedura',b:`<p><strong>∩x:</strong> \\(y=0\\) → NUM=0</p><p><strong>∩y:</strong> \\(x=0\\) solo se \\(0\\in D\\)</p><p>Es (PDF 292): \\(A(3;0),B(1;0),C(-1;0)\\)</p>`}],
+  'Studio del Segno':[{t:'Tabella dei Segni',b:`<p>1. Valori critici (zeri + punti esclusi)</p><p>2. Una riga per ogni fattore</p><p>3. Segno = prodotto dei segni</p>`}],
+  'Simmetrie':[{t:'Pari / Dispari',b:`<p>Pari: \\(f(-x)=f(x)\\)</p><p>Dispari: \\(f(-x)=-f(x)\\)</p><p>Es (PDF 275): \\(\\frac{4x+3}{x-1}\\) → né pari né dispari</p>`}],
+  'Asintoti Verticali':[{t:'Definizione',b:`<p>\\(x=c\\) A.V. se \\(\\lim_{x\\to c^\\pm}f(x)=\\pm\\infty\\)</p><p>Es (PDF 292): A.V.: \\(x=0\\) e \\(x=2\\)</p>`}],
+  'Asintoto Obliquo / Orizzontale':[
+    {t:'Orizzontale',b:`<p>Se \\(\\lim_{x\\to\\pm\\infty}f(x)=L\\) → \\(y=L\\)</p><p>Es (PDF 275): \\(\\lim\\frac{4x+3}{x-1}=4\\) → \\(y=4\\)</p>`},
+    {t:'Obliquo y=mx+q',b:`<p>\\(m=\\lim_{x\\to\\pm\\infty}\\frac{f(x)}{x}\\)</p><p>\\(q=\\lim_{x\\to\\pm\\infty}[f(x)-mx]\\)</p><p>Es (PDF 292): \\(m=1,\\;q=-5\\) → \\(y=x-5\\)</p>`}
+  ],
+  'FARF Completo':[
+    {t:'Schema 6 Passi',b:`<p>1. <b>Dominio</b></p><p>2. <b>Intersezioni assi</b></p><p>3. <b>Studio del segno</b></p><p>4. <b>Simmetrie</b></p><p>5. <b>Asintoti verticali</b></p><p>6. <b>Asintoti oriz./obliqui</b></p>`},
+    {t:'Esempio (PDF 292)',b:`<p>\\(y=\\frac{x^3-3x^2-x+3}{x^2-2x}\\)</p><p>D: \\(\\mathbb{R}\\setminus\\{0;2\\}\\)</p><p>∩x: A(3;0), B(1;0), C(-1;0)</p><p>A.V.: x=0 e x=2</p><p>A.Obl.: y=x-5 (m=1, q=-5)</p>`}
+  ]
+};
+
+function renderNotes(topic){
+  const secs=NOTES[topic]||[];
+  let html=`<div class="notes-title">${topic}</div><div class="notes-sub">Appunti dagli originali scritti a mano</div>`;
+  secs.forEach(s=>{
+    html+=`<div class="note-sec"><div class="note-sec-title">${s.t}</div><div class="note-card">${s.b}</div></div>`;
+  });
+  const el=document.getElementById('notes-content');
+  el.innerHTML=html;
+  renderMath(el);
+}
+
+// ═══ SOLVER ═══
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendProblem();}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
+
+async function sendProblem(){
+  const input=document.getElementById('problem-input');
+  const text=input.value.trim();
+  if(!text||!apiKey)return;
+  document.getElementById('welcome').style.display='none';
+  const btn=document.getElementById('send-btn');
+  btn.disabled=true;
+  input.value='';input.style.height='auto';
+  addMsg('user',text);
+  chatHistory.push({role:'user',content:text});
+  const fnMatch=text.match(/f\s*\(x\)\s*=\s*(.+)|y\s*=\s*(.+)/i);
+  if(fnMatch)lastFunction=(fnMatch[1]||fnMatch[2]).trim();
+  const tid=addTyping();
+  try{
+    const resp=await callAI(chatHistory,buildSystemPrompt(),2500);
+    removeTyping(tid);
+    addMsg('ai',resp);
+    chatHistory.push({role:'assistant',content:resp});
+    const rm=resp.match(/GeoGebra[:\s]+f\(x\)=([^\n,]+)/i);
+    if(rm)lastFunction=rm[1].trim();
+  }catch(err){
+    removeTyping(tid);
+    addErrMsg(err.message);
+  }
+  btn.disabled=false;
+  scrollBot();
+}
+
+function addMsg(role,text){
+  const msgs=document.getElementById('msgs');
+  const div=document.createElement('div');
+  div.className='msg '+role;
+  const content=role==='ai'?formatAI(text):esc(text);
+  div.innerHTML=`<div class="msg-label">${role==='user'?'✏ Tu':'🧮 MateSolver'}</div><div class="bubble">${content}</div>`;
+  msgs.appendChild(div);
+  if(role==='ai')renderMath(div);
+  scrollBot();
+}
+
+function addTyping(){
+  const msgs=document.getElementById('msgs');
+  const id='t'+Date.now();
+  const div=document.createElement('div');
+  div.className='msg ai';div.id=id;
+  div.innerHTML='<div class="msg-label">🧮 MateSolver</div><div class="bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
+  msgs.appendChild(div);scrollBot();return id;
+}
+function removeTyping(id){const e=document.getElementById(id);if(e)e.remove();}
+function addErrMsg(msg){
+  const msgs=document.getElementById('msgs');
+  const div=document.createElement('div');
+  div.className='msg ai';
+  div.innerHTML='<div class="msg-label">⚠ Errore</div><div class="bubble"><div class="error-box">'+esc(msg)+'</div></div>';
+  msgs.appendChild(div);
+}
+function scrollBot(){const c=document.getElementById('chat-scroll');setTimeout(()=>c.scrollTop=c.scrollHeight,50);}
+
+// Format AI response: **Passo N** → step blocks
+function formatAI(text){
+  let h=esc(text);
+  h=h.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  // Step blocks
+  const stepRe=/(<strong>Passo\s+\d+[^<]*<\/strong>:?)/g;
+  const parts=h.split(stepRe);
+  if(parts.length>1){
+    let out=parts[0];
+    for(let i=1;i<parts.length;i++){
+      if(stepRe.test(parts[i])||/<strong>Passo/.test(parts[i])){
+        if(i>1)out+='</div>';
+        out+='<div class="step"><div class="step-n">'+parts[i]+'</div>';
+      } else {
+        out+=parts[i];
+      }
+    }
+    if(parts.length>1)out+='</div>';
+    h=out;
+  }
+  h=h.replace(/(<strong>Risultato[^<]*<\/strong>[^\n<]*)/g,'<div class="result-box">$1</div>');
+  h=h.replace(/\n/g,'<br>');
+  return h;
+}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function renderMath(el){
+  function go(){if(window.renderMathInElement)renderMathInElement(el,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false},{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});}
+  window._katexReady?go():setTimeout(go,600);
+}
+
+// ═══ GEOGEBRA ═══
+function injectLastFunction(){
+  if(!lastFunction){alert('Nessuna funzione rilevata nella conversazione. Scrivi un problema con y=... o f(x)=...');return;}
+  const clean=lastFunction.replace(/\s+/g,'');
+  document.getElementById('geo-frame').src='https://www.geogebra.org/classic?lang=it';
+  setTimeout(()=>{
+    try{document.getElementById('geo-frame').contentWindow.postMessage({type:'ggb-eval',command:'f(x)='+clean},'*');}catch(e){}
+  },2000);
+  alert('Inserisci nella barra di input di GeoGebra:\n\nf(x)='+lastFunction);
+}
+
+// init
+selectProvider('groq');
+</script>
+</body>
+</html>

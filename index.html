@@ -127,6 +127,53 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .geo-btn:hover{color:var(--text);border-color:var(--accent2);}
 #geo-frame{flex:1;border:none;background:#fff;}
 
+/* FARF tiles */
+.farf-bar{
+  display:flex;align-items:center;justify-content:center;
+  gap:6px;padding:10px 8px 8px;
+}
+.farf-letter{
+  width:36px;height:36px;border-radius:8px;
+  background:var(--surface2);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Serif Display',serif;font-size:1.1rem;
+  color:var(--accent);cursor:default;
+  transition:all .2s;
+}
+.farf-letter:hover{background:#1e2230;border-color:var(--accent);transform:translateY(-2px);}
+.farf-dot{color:var(--muted);font-size:.9rem;}
+
+.farf-steps{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:6px 8px;}
+.farf-step{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:9px 8px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;transition:all .15s;text-align:center;
+}
+.farf-step:hover{border-color:var(--border2);background:#1e2230;}
+.farf-step.active{border-color:var(--accent);background:#1a1e2a;}
+.farf-n{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--border2);
+  font-family:'DM Mono',monospace;font-size:.7rem;font-weight:700;
+  color:var(--muted2);display:flex;align-items:center;justify-content:center;
+  transition:all .15s;flex-shrink:0;
+}
+.farf-step.active .farf-n{background:var(--accent);color:#0b0c0e;}
+.farf-name{font-size:.72rem;color:var(--muted2);font-family:'DM Sans',sans-serif;line-height:1.2;}
+.farf-step.active .farf-name{color:var(--accent);}
+
+.farf-complete-btn{
+  width:calc(100% - 16px);margin:4px 8px 8px;
+  background:linear-gradient(135deg,#1a1e2a,#1e2234);
+  border:1px solid var(--accent);border-radius:8px;
+  color:var(--accent);font-family:'DM Mono',monospace;font-size:.75rem;
+  font-weight:700;letter-spacing:.05em;padding:10px;
+  cursor:pointer;transition:all .15s;
+}
+.farf-complete-btn:hover{background:linear-gradient(135deg,#1e2234,#222740);transform:translateY(-1px);}
+.farf-complete-btn.active{background:rgba(232,197,71,.15);}
+
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px;}
 @media(max-width:950px){#screen-main{grid-template-columns:1fr 320px;}.sidebar{display:none;}}
 @media(max-width:640px){#screen-main{grid-template-columns:1fr;}.geo-panel{display:none;}}
@@ -181,13 +228,49 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
     <button class="topic-btn" onclick="selectTopic(this,'Funzioni Continue')"><span class="topic-dot"></span>Funzioni Continue</button>
     <hr class="side-div">
     <div class="side-title">Studio di Funzione</div>
-    <button class="topic-btn" onclick="selectTopic(this,'Dominio')"><span class="topic-dot"></span>1. Dominio</button>
-    <button class="topic-btn" onclick="selectTopic(this,'Intersezioni con gli Assi')"><span class="topic-dot"></span>2. Intersezioni Assi</button>
-    <button class="topic-btn" onclick="selectTopic(this,'Studio del Segno')"><span class="topic-dot"></span>3. Studio del Segno</button>
-    <button class="topic-btn" onclick="selectTopic(this,'Simmetrie')"><span class="topic-dot"></span>4. Simmetrie</button>
-    <button class="topic-btn" onclick="selectTopic(this,'Asintoti Verticali')"><span class="topic-dot"></span>5. Asintoti Verticali</button>
-    <button class="topic-btn" onclick="selectTopic(this,'Asintoto Obliquo / Orizzontale')"><span class="topic-dot"></span>6. Asintoti</button>
-    <button class="topic-btn" onclick="selectTopic(this,'FARF Completo')"><span class="topic-dot"></span>FARF Completo</button>
+
+    <!-- FARF acronym bar -->
+    <div class="farf-bar">
+      <span class="farf-letter" title="Forma / Dominio">F</span>
+      <span class="farf-dot">·</span>
+      <span class="farf-letter" title="Assi / Intersezioni">A</span>
+      <span class="farf-dot">·</span>
+      <span class="farf-letter" title="Reale / Segno">R</span>
+      <span class="farf-dot">·</span>
+      <span class="farf-letter" title="Funzione / Grafico">F</span>
+    </div>
+
+    <!-- Step tiles -->
+    <div class="farf-steps">
+      <button class="farf-step" onclick="selectTopic(this,'Dominio')">
+        <span class="farf-n">1</span>
+        <span class="farf-name">Dominio</span>
+      </button>
+      <button class="farf-step" onclick="selectTopic(this,'Intersezioni con gli Assi')">
+        <span class="farf-n">2</span>
+        <span class="farf-name">Intersezioni</span>
+      </button>
+      <button class="farf-step" onclick="selectTopic(this,'Studio del Segno')">
+        <span class="farf-n">3</span>
+        <span class="farf-name">Segno</span>
+      </button>
+      <button class="farf-step" onclick="selectTopic(this,'Simmetrie')">
+        <span class="farf-n">4</span>
+        <span class="farf-name">Simmetrie</span>
+      </button>
+      <button class="farf-step" onclick="selectTopic(this,'Asintoti Verticali')">
+        <span class="farf-n">5</span>
+        <span class="farf-name">A. Verticali</span>
+      </button>
+      <button class="farf-step" onclick="selectTopic(this,'Asintoto Obliquo / Orizzontale')">
+        <span class="farf-n">6</span>
+        <span class="farf-name">A. Obliqui</span>
+      </button>
+    </div>
+
+    <button class="farf-complete-btn" onclick="selectTopic(this,'FARF Completo')">
+      ★ FARF Completo
+    </button>
   </nav>
 
   <main class="main-area">
@@ -464,7 +547,7 @@ function switchPanel(id,btn){
 }
 
 function selectTopic(btn,topic){
-  document.querySelectorAll('.topic-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.topic-btn,.farf-step,.farf-complete-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   currentTopic=topic;
   document.getElementById('topic-hint').innerHTML='Argomento: <b>'+topic+'</b>';

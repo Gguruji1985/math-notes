@@ -211,6 +211,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 @media(max-width:950px){#screen-main{grid-template-columns:1fr 320px;}.sidebar{display:none;}}
 @media(max-width:640px){#screen-main{grid-template-columns:1fr;}.geo-panel{display:none;}}
 </style>
+<script src="https://www.geogebra.org/apps/deployggb.js"></script>
 </head>
 <body>
 
@@ -512,9 +513,10 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   <aside class="geo-panel">
     <div class="geo-header">
       <span class="geo-title">📐 GeoGebra Classic</span>
-      <button class="geo-btn" onclick="injectLastFunction()">Grafica ultima funzione</button>
+      <span id="geo-status" style="font-size:.65rem;font-family:'DM Mono',monospace;color:var(--muted);">caricamento...</span>
+      <button class="geo-btn" style="margin-left:auto" onclick="geoClear()">🗑 Pulisci</button>
     </div>
-    <iframe id="geo-frame" src="https://www.geogebra.org/classic?lang=it" allowfullscreen></iframe>
+    <div id="ggb-element" style="flex:1;min-height:0;"></div>
   </aside>
 </div>
 
@@ -831,8 +833,9 @@ async function sendProblem(){
     removeTyping(tid);
     addMsg('ai',resp);
     chatHistory.push({role:'assistant',content:resp});
-    const rm=resp.match(/GeoGebra[:\s]+f\(x\)=([^\n,]+)/i);
-    if(rm)lastFunction=rm[1].trim();
+    // Auto-detect function and inject into GeoGebra
+    const autoFn = detectFunction(resp);
+    if (autoFn) { lastFunction = autoFn; geoAutoInject(autoFn); }
   }catch(err){
     removeTyping(tid);
     addErrMsg(err.message);
@@ -901,16 +904,65 @@ function renderMath(el){
   window._katexReady?go():setTimeout(go,600);
 }
 
-// ═══ GEOGEBRA ═══
-function injectLastFunction(){
-  if(!lastFunction){alert('Nessuna funzione rilevata nella conversazione. Scrivi un problema con y=... o f(x)=...');return;}
-  const clean=lastFunction.replace(/\s+/g,'');
-  document.getElementById('geo-frame').src='https://www.geogebra.org/classic?lang=it';
-  setTimeout(()=>{
-    try{document.getElementById('geo-frame').contentWindow.postMessage({type:'ggb-eval',command:'f(x)='+clean},'*');}catch(e){}
-  },2000);
-  alert('Inserisci nella barra di input di GeoGebra:\n\nf(x)='+lastFunction);
+// ═══ GEOGEBRA API (auto-inject) ═══
+let ggbReady = false;
+let ggbQueue = [];
+
+function initGeoGebra() {
+  const params = {
+    appName: 'classic',
+    width: '100%',
+    height: '100%',
+    showToolBar: true,
+    showAlgebraInput: true,
+    showMenuBar: false,
+    language: 'it',
+    id: 'ggb',
+    appletOnLoad: function() {
+      ggbReady = true;
+      document.getElementById('geo-status').textContent = 'pronto';
+      document.getElementById('geo-status').style.color = 'var(--green)';
+      // flush queue
+      ggbQueue.forEach(cmd => window.ggb && window.ggb.evalCommand(cmd));
+      ggbQueue = [];
+    }
+  };
+  const applet = new GGBApplet(params, true);
+  applet.inject('ggb-element');
 }
+
+// Auto-called after every AI response
+function geoAutoInject(fnExpr) {
+  if (!fnExpr) return;
+  // Clean up expression for GeoGebra
+  let expr = fnExpr
+    .replace(/×/g, '*').replace(/÷/g, '/')
+    .replace(/π/g, 'pi').replace(/√/g, 'sqrt')
+    .replace(/\^/g, '^').trim();
+  // Use a fresh name each time so multiple functions accumulate
+  const label = 'f(x)';
+  const cmd = label + '=' + expr;
+  if (ggbReady && window.ggb) {
+    try { window.ggb.evalCommand(cmd); } catch(e) {}
+  } else {
+    ggbQueue.push(cmd);
+  }
+  document.getElementById('geo-status').textContent = 'f(x)=' + expr.slice(0,20) + (expr.length > 20 ? '…' : '');
+  document.getElementById('geo-status').style.color = 'var(--accent)';
+}
+
+function geoClear() {
+  if (ggbReady && window.ggb) {
+    window.ggb.newConstruction();
+    document.getElementById('geo-status').textContent = 'pulito';
+    document.getElementById('geo-status').style.color = 'var(--muted)';
+  }
+}
+
+window.addEventListener('load', function() {
+  if (typeof GGBApplet !== 'undefined') initGeoGebra();
+  else setTimeout(initGeoGebra, 1500);
+});
 
 // ═══ MATH KEYBOARD ═══
 function toggleKbd(){
@@ -953,6 +1005,25 @@ function kbsMove(dir){
   el.focus();
   const p=el.selectionStart+dir;
   el.setSelectionRange(p,p);
+}
+
+// ═══ FUNCTION DETECTION ═══
+function detectFunction(text) {
+  // Look for f(x)=... or y=... patterns
+  const patterns = [
+    /f\(x\)\s*=\s*([^\n,;]+)/i,
+    /y\s*=\s*([^\n,;(]+)/i,
+    /GeoGebra[:\s]+f\(x\)=([^\n,]+)/i,
+    /grafica[^:]*:\s*f\(x\)=([^\n,]+)/i,
+  ];
+  for (const p of patterns) {
+    const m = text.match(p);
+    if (m) {
+      let fn = m[1].trim().replace(/\\[a-z]+/g,'').replace(/[\[\]{}]/g,'');
+      if (fn.length > 2 && fn.length < 80) return fn;
+    }
+  }
+  return null;
 }
 
 // init

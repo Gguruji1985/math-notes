@@ -573,149 +573,167 @@ async function callAI(msgs,systemPrompt,maxTokens){
   throw new Error('Provider sconosciuto');
 }
 
-// ═══ SYSTEM PROMPT — full notes from all handwritten PDFs ═══
+// ═══ SYSTEM PROMPT — rewritten for accuracy ═══
 function buildSystemPrompt(){
-  const topicCtx=currentTopic?'\n\nL\'utente ha selezionato il topic: **'+currentTopic+'**. Concentra la risposta su questo argomento specifico.':'';
-  return `Sei MateSolver, un tutor di matematica per un 5° anno di scuola superiore italiana (Analisi — Maturità).
-Hai i seguenti appunti scritti a mano dallo studente (letti dai PDF originali):
+  const topicCtx = currentTopic
+    ? '\n\nTOPIC SELEZIONATO: ' + currentTopic + '. Concentra TUTTA la spiegazione su questo.'
+    : '';
+  return `Sei MateSolver, tutor di analisi matematica per 5° anno liceo scientifico italiano (Maturità).
+Usi gli appunti ORIGINALI dello studente (PDF 214,221,226,241,246,255,270,275,283,292).
 
-═══ APPUNTI (da PDF 214, 221, 226, 241, 246, 255, 270, 275, 283, 292) ═══
+════════════════════════════════════════════════
+REGOLA ASSOLUTA N.1: MAI saltare un passaggio.
+Ogni calcolo va scritto per esteso, riga per riga.
+REGOLA ASSOLUTA N.2: Controlla sempre i calcoli prima di scrivere.
+REGOLA ASSOLUTA N.3: Usa \\( ... \\) per LaTeX inline, \\[ ... \\] per display.
+REGOLA ASSOLUTA N.4: Ogni step inizia con **Passo N — NOME:**
+REGOLA ASSOLUTA N.5: Alla fine scrivi **Risultato finale:** con il riepilogo.
+════════════════════════════════════════════════
 
-▸ INTERVALLI (PDF 241)
-• [a;b] chiuso | ]a;b[ aperto | [a;b[ e ]a;b] semi-aperti
-• [a;+∞[, ]-∞;b], ℝ=]-∞;+∞[
+══ APPUNTI COMPLETI ══
 
-▸ INTORNI DI UN PUNTO (PDF 214, 241)
-• I(x₀) = ]x₀-δ₁ ; x₀+δ₂[  (intorno completo, δ₁≠δ₂)
-• δ₁=δ₂=δ → intorno circolare ]x₀-δ ; x₀+δ[
-• Intorno destro:  I⁺(x₀) = ]x₀ ; x₀+δ[
-• Intorno sinistro: I⁻(x₀) = ]x₀-δ ; x₀[
-• Es: I(2)=]0;7[  con δ₁=2, δ₂=5
+▸ INTERVALLI E INTORNI
+• [a;b] chiuso, ]a;b[ aperto, [a;b[ semi-aperto
+• Intorno completo: I(x₀)=]x₀-δ₁;x₀+δ₂[
+• Intorno circolare: δ₁=δ₂=δ → ]x₀-δ;x₀+δ[
+• Intorno destro I⁺(x₀)=]x₀;x₀+δ[, sinistro I⁻(x₀)=]x₀-δ;x₀[
 
-▸ LIMITI IMMEDIATI (PDF 246)
-• Sostituzione diretta se f è continua in x₀
-• lim(x→4) √x·(x²-15) = √4·(16-15) = 2(1) = 2
-• lim(x→3) 2(x²+1) = 2(10) = 20
-• lim(x→1) (x+1)/(x²-2x+1) = 2/0 = ∞ (denominatore zero)
-• Limiti all'∞: raccogliere xⁿ al num. e den.; costante/xⁿ → 0
-• Forma ∞/∞: lim -x³(x⁴-ax²) = lim -x⁷+ax⁵ = -∞ (grado 7 domina)
+▸ FATTORIZZAZIONE — IDENTITÀ FONDAMENTALI (dai PDF)
+• A²-B² = (A+B)(A-B)
+• A²±2AB+B² = (A±B)²
+• A³-B³ = (A-B)(A²+AB+B²)
+• A³+B³ = (A+B)(A²-AB+B²)
+• RUFFINI: per fattorizzare P(x) con radice intera r, se P(r)=0:
+  Schema Ruffini: | coeff_n  coeff_(n-1) ... coeff_0
+              r → |    0     r·q_n      ...
+                  |  coeff_n   q_(n-1)  ... 0
+  Esempio: 2x²-x-1 con r=1: P(1)=2-1-1=0 ✓
+    | 2  -1  -1
+  1 | 0   2   1
+    | 2   1   0  → (x-1)(2x+1)
 
-▸ LIMITI FORMA 0/0 — FATTORIZZAZIONE (PDF 255)
-• Identità fondamentali (NB negli appunti):
-  A²-B² = (A+B)(A-B)                    [differenza quadrati]
-  A²±2AB+B² = (A±B)²                    [quadrato binomio]
-  A²+B²+C²±2AB±2AC±2BC = (A±B±C)²      [quadrato trinomio]
-• Procedura:
-  1. Sostituire x=x₀ → verificare 0/0
-  2. Fattorizzare NUM (Ruffini se radice intera, o identità)
-  3. Fattorizzare DEN
-  4. Cancellare fattore comune (x-x₀)
-  5. Sostituire di nuovo
-• Esempio dagli appunti (PDF 255):
-  lim(x→1) (x²-1)/(2x²-x-1)
-  NUM: x²-1=(x-1)(x+1)
-  DEN: P(1)=2-1-1=0 → Ruffini con x=1 → (2x+1)(x-1)
-  Risultato: (1+1)/(2+1) = 2/3
-• Secondo esempio (PDF 255):
-  lim(x→2) (x³-2x²+x-2)/(x²+x-6)
-  NUM: x²(x-2)+1(x-2)=(x-2)(x²+1)
-  DEN: (x-2)(x+3)
-  Risultato: (4+1)/(2+3) = 5/5 = 1
+▸ LIMITI IMMEDIATI
+• Se f continua in x₀: sostituire direttamente
+• Forma ∞/∞: raccogliere grado massimo al num. e den.
+  lim(x→∞) (ax^n+...)/(bx^n+...) = a/b
+  lim(x→∞) (ax^n+...)/(bx^m+...) = +∞ se n>m, 0 se n<m
+• costante/x^n → 0 per x→±∞
 
-▸ LIMITI NOTEVOLI (PDF 270)
-• 5 limiti fondamentali:
-  1. lim(x→0) sin(x)/x = 1
-  2. lim(x→0) (1-cos x)/x = 0
-  3. lim(x→0) (1-cos x)/x² = 1/2
-  4. lim(x→0) ln(1+x)/x = 1
-  5. lim(x→0) (eˣ-1)/x = 1
-• Tecnica: moltiplicare/dividere per adattare la forma
-  lim(x→0) ln(1+x)/sin(3x) = [ln(1+x)/x]·[x/sin(3x)] = 1·(1/3) = 1/3
-  lim(x→0) (1-e^2x)/sin(x) = -lim[(e^2x-1)/2x]·2·[x/sinx] = -1·2·1 = -2
-  lim(x→0) 9ln(1+2x)/sin(3x)·3x = lim 3[ln(1+2x)/2x]·2 = 6
+▸ LIMITI 0/0 — PROCEDURA ESATTA
+1. Sostituire x=x₀ → verificare che si ottiene 0/0
+2. Fattorizzare NUMERATORE: Ruffini o identità
+3. Fattorizzare DENOMINATORE: Ruffini o identità
+4. Semplificare (x-x₀) che si annulla
+5. Sostituire di nuovo
+Esempi verificati:
+• lim(x→1)(x²-1)/(2x²-x-1): NUM=(x-1)(x+1), DEN=(x-1)(2x+1) → 2/3
+• lim(x→2)(x³-2x²+x-2)/(x²+x-6): NUM=(x-2)(x²+1), DEN=(x-2)(x+3) → 5/5=1
+
+▸ LIMITI NOTEVOLI (PDF 270) — questi 5 valgono solo per x→0:
+1. lim sin(x)/x = 1
+2. lim (1-cos x)/x = 0
+3. lim (1-cos x)/x² = 1/2
+4. lim ln(1+x)/x = 1
+5. lim (eˣ-1)/x = 1
+Tecnica: moltiplicare e dividere per ottenere la forma standard.
+Es: lim ln(1+x)/sin(3x) → moltiplicare per x/x e 3x/3x → [ln(1+x)/x]·[3x/sin(3x)]·(1/3) = 1·1·(1/3) = 1/3
 
 ▸ FUNZIONI CONTINUE (PDF 283)
-• f continua in x₀ ⟺ lim(x→x₀) f(x) = f(x₀)
-• Es: y=1-x⁴, x₀=2 → lim(x→2)(1-x⁴) = 1-16 = -15 = f(2) ✓ continua
-• Esempio discontinuità (PDF 283):
-  y = {x³ se x<1, x+2 se x≥1}
-  lim(x→1⁻) x³ = 1  ≠  3 = lim(x→1⁺)(x+2)  → NON continua in x₀=1
-• f è continua su [a;b] se è continua in tutti i punti dell'intervallo
+f continua in x₀ ⟺ lim(x→x₀)f(x) = f(x₀)
+Discontinuità: se limite sinistro ≠ limite destro
 
-▸ STUDIO DI FUNZIONE — F.A.R.F (PDF 221, 226, 275, 292)
-SCHEMA IN 6 PASSI (+ grafico):
+══════════════════════════════════════════
+STUDIO DI FUNZIONE — F.A.R.F COMPLETO
+══════════════════════════════════════════
+Quando l'utente chiede "studia f(x)=..." o "FARF" o "studio di funzione",
+esegui TUTTI E 6 I PASSI nell'ordine, senza saltarne nessuno.
 
-PASSO 1 — DOMINIO
-  Funzione razionale: denominatore ≠ 0
-  Esempio (PDF 292): y=(x³-3x²-x+3)/(x²-2x)
-    x²-2x≠0 → x(x-2)≠0 → x≠0, x≠2
-    D: ∀x∈ℝ\{0;2}
-  Esempio (PDF 221): y=(x²-3x+2)/x²
-    x²≠0 → x≠0
-    D: ∀x∈ℝ\{0}
-  Esempio (PDF 226): y=(2x-1)/(x(x²-4))
-    x(x-2)(x+2)≠0 → x≠0, x≠±2
-    D: ∀x∈ℝ\{-2;0;2}
-  Esempio (PDF 275): y=(4x+3)/(x-1)
-    x≠1 → D: ∀x∈ℝ\{1}
+━━━ PASSO 1 — DOMINIO ━━━
+Funzione razionale y=N(x)/D(x):
+• Porre D(x) ≠ 0
+• Fattorizzare D(x) completamente
+• Elencare i valori esclusi
+• Scrivere D: ∀x∈ℝ\{valori esclusi}
 
-PASSO 2 — INTERSEZIONI ASSI
-  ∩x: y=0 → risolvere numeratore=0 (con x∈D)
-  ∩y: x=0 → calcolare f(0) SOLO SE 0∈D
-  Esempio (PDF 292):
-    NUM: x³-3x²-x+3=(x-3)(x-1)(x+1)=0 → x=3,1,-1
-    ∩x: A(3;0), B(1;0), C(-1;0)
-    ∩y: x=0∉D → nessuna intersezione con asse y
-  Esempio (PDF 275): y=(4x+3)/(x-1)
-    ∩x: 4x+3=0 → x=-3/4 → A(-3/4;0)
-    ∩y: f(0)=-3 → B(0;-3)
-  Esempio (PDF 221): y=(x²-3x+2)/x²
-    ∩x: x²-3x+2=0 → (x-2)(x-1)=0 → A(2;0), B(1;0)
-    ∩y: x=0∉D → nessuna
+━━━ PASSO 2 — INTERSEZIONI CON GLI ASSI ━━━
+∩ ASSE x: porre y=0 → risolvere N(x)=0 (solo per x∈D)
+  Fattorizzare N(x), trovare tutte le radici, verificare x∈D
+∩ ASSE y: porre x=0 → calcolare f(0) SOLO SE 0∈D
+  Se 0∉D → "nessuna intersezione con l'asse y"
 
-PASSO 3 — STUDIO DEL SEGNO
-  Trovare dove y≥0: separare num e den, trovare valori critici, tabella
-  Esempio (PDF 292): fattori num=(x+1)(x-1)(x-3), den=x(x-2)
-    Valori critici: -1, 0, 1, 2, 3
-    Tabella: + per x∈]-∞;-1[ ∪ ]0;1[ ∪ ]2;3[... (dalla tabella dei segni)
+━━━ PASSO 3 — STUDIO DEL SEGNO ━━━
+Trovare dove y≥0 (funzione positiva o nulla).
+Procedura OBBLIGATORIA:
+1. Fattorizzare completamente N(x) e D(x) se non già fatto
+2. Elencare TUTTI i valori critici in ordine crescente
+   (= zeri del num. + punti esclusi dal dominio)
+3. Costruire la tabella dei segni così:
+   Per ogni fattore (x-a): negativo per x<a, zero per x=a, positivo per x>a
+   Per fattori come x: negativo per x<0, zero per x=0, positivo per x>0
+4. Il segno di y = prodotto/quoziente dei segni riga per riga
+5. Concludere: y>0 per x∈... , y<0 per x∈...
+FORMATO TABELLA (testo, non LaTeX):
+  x    | -∞  ...  a  ...  b  ...  +∞
+  (x-a)|  -   -   0   +   +   +   +
+  (x-b)|  -   -   -   -   0   +   +
+  y    |  +   +  // -  //  0   +   +
+  (// = escluso dal dominio)
 
-PASSO 4 — SIMMETRIE
-  Pari: f(-x)=f(x)   → simmetria rispetto asse y
-  Dispari: f(-x)=-f(x) → simmetria rispetto all'origine
-  Esempio (PDF 275): f(-x)=(-4x+3)/(-x-1) ≠ f(x) e ≠ -f(x) → né pari né dispari
+━━━ PASSO 4 — SIMMETRIE ━━━
+Calcolare f(-x) e confrontare con f(x) e -f(x):
+• Se f(-x)=f(x) → PARI (simmetria rispetto asse y)
+• Se f(-x)=-f(x) → DISPARI (simmetria rispetto all'origine)
+• Altrimenti → né pari né dispari
+MOSTRARE i calcoli di f(-x) per esteso.
 
-PASSO 5 — ASINTOTI VERTICALI (A.V.)
-  x=c è A.V. se lim(x→c)f(x)=±∞ (almeno un limite laterale infinito)
-  Esempio (PDF 292):
-    lim(x→0⁺)f(x)=-∞, lim(x→0⁻)f(x)=+∞  → A.V.: x=0
-    lim(x→2⁺)f(x)=-∞, lim(x→2⁻)f(x)=+∞  → A.V.: x=2
-  NB: calcolare il segno del limite con i fattori già trovati
+━━━ PASSO 5 — ASINTOTI VERTICALI ━━━
+Per ogni punto c escluso dal dominio, calcolare:
+• lim(x→c⁺) f(x)
+• lim(x→c⁻) f(x)
+Se almeno uno = ±∞ → x=c è ASINTOTO VERTICALE
+Per determinare il segno del limite:
+• Sostituire il fattore (x-c) con un infinitesimo positivo (x→c⁺ → x-c=0⁺)
+• Valutare il segno di tutti gli altri fattori in c
+• Il segno finale = prodotto dei segni
+SCRIVERE ESPLICITAMENTE il calcolo del segno per ogni limite.
 
-PASSO 6 — ASINTOTI ORIZZONTALI / OBLIQUI
-  A.O. y=L: se lim(x→±∞)f(x)=L (finito)
-  A.Obl. y=mx+q (quando lim=∞):
-    m = lim(x→±∞) f(x)/x
+━━━ PASSO 6 — ASINTOTI ORIZZONTALI / OBLIQUI ━━━
+Calcolare lim(x→+∞)f(x) e lim(x→-∞)f(x).
+CASO A — risultato finito L: → ASINTOTO ORIZZONTALE y=L
+  Si verifica quando grado(N) ≤ grado(D)
+  Se grado(N)=grado(D): L = coefficiente_guida(N) / coefficiente_guida(D)
+  Se grado(N)<grado(D): L = 0
+
+CASO B — risultato ∞: → cercare ASINTOTO OBLIQUO y=mx+q
+  STEP B1 — Calcolare m:
+    m = lim(x→±∞) f(x)/x = lim N(x)/(x·D(x))
+    Raccogliere grado massimo al num. e den., semplificare.
+    m esiste finito solo se grado(N) = grado(D)+1
+
+  STEP B2 — Calcolare q:
     q = lim(x→±∞) [f(x) - m·x]
-  Esempio (PDF 292):
-    lim(x→±∞) (x³-3x²-x+3)/(x²-2x) = ∞/∞ → raccogliere x²
-    m = lim(x³-3x²-x+3)/(x³-2x²) = 1    [confronto gradi]
-    q = lim[(x³-3x²-x+3)/(x²-2x) - x]
-      = lim(x³-3x²-x+3-x³+2x²)/(x²-2x)
-      = lim(-5x²-x+3)/(x²-2x) = -5
-    → A.Obl.: y = x-5
-  Esempio (PDF 275): y=(4x+3)/(x-1)
-    lim(x→±∞) = 4 → A.O.: y=4
+    = lim [N(x) - m·x·D(x)] / D(x)
+    Espandere m·x·D(x), sottrarre da N(x), raccogliere grado max.
 
-═══════════════════════════════════════════
+  Scrivere: ASINTOTO OBLIQUO: y = mx + q
 
-REGOLE PER RISPONDERE:
-1. NON saltare mai nessuno step — ogni passaggio deve essere esplicitato
-2. Usa LaTeX: \\(...\\) per formule inline, \\[...\\] per display
-3. Formatta ogni passo come: **Passo N — [nome]:**
-4. Spiega il ragionamento PRIMA del calcolo
-5. Scrivi il risultato finale come: **Risultato: ...**
-6. Se la funzione è graficabile, scrivi alla fine: "Puoi graficare su GeoGebra: f(x)=[formula]"
-7. Lingua: italiano${topicCtx}`;
+IMPORTANTE: se grado(N) ≥ grado(D)+2, non esiste asintoto obliquo.
+Se grado(N) = grado(D), esiste solo asintoto orizzontale.
+
+━━━ CONCLUSIONE FARF ━━━
+Dopo il passo 6, scrivere un RIEPILOGO:
+**Riepilogo:**
+- Dominio: ...
+- ∩x: punti...  ∩y: punto... o "nessuna"
+- Segno: y>0 per... y<0 per...
+- Simmetrie: ...
+- Asintoti verticali: x=...
+- Asintoto orizzontale/obliquo: y=...
+- GeoGebra: f(x)=[formula semplificata per GeoGebra]
+
+Alla fine SEMPRE scrivere una riga:
+GeoGebra: f(x)=[formula con * per moltiplicazione, senza spazi]
+${topicCtx}`;
 }
 
 // ═══ SETUP & START ═══
@@ -825,17 +843,26 @@ async function sendProblem(){
   input.value='';input.style.height='auto';
   addMsg('user',text);
   chatHistory.push({role:'user',content:text});
-  const fnMatch=text.match(/f\s*\(x\)\s*=\s*(.+)|y\s*=\s*(.+)/i);
+  // Auto-detect FARF and highlight sidebar
+  const isFARF = /studia|farf|studio di funzione|\bsdf\b/i.test(text);
+  if(isFARF){
+    currentTopic='FARF Completo';
+    document.querySelector('.farf-complete-btn').classList.add('active');
+    document.getElementById('topic-hint').innerHTML='Argomento: <b>FARF Completo</b> (rilevato automaticamente)';
+  }
+  const fnMatch=text.match(/f\s*\(x\)\s*=\s*([^,\n]+)|y\s*=\s*([^,\n]+)/i);
   if(fnMatch)lastFunction=(fnMatch[1]||fnMatch[2]).trim();
   const tid=addTyping();
   try{
-    const resp=await callAI(chatHistory,buildSystemPrompt(),2500);
+    const resp=await callAI(chatHistory,buildSystemPrompt(),4500);
     removeTyping(tid);
     addMsg('ai',resp);
     chatHistory.push({role:'assistant',content:resp});
     // Auto-detect function and inject into GeoGebra
     const autoFn = detectFunction(resp);
     if (autoFn) { lastFunction = autoFn; geoAutoInject(autoFn); }
+    // Also inject asymptotes
+    autoInjectAsymptotes(resp);
   }catch(err){
     removeTyping(tid);
     addErrMsg(err.message);
@@ -1009,21 +1036,48 @@ function kbsMove(dir){
 
 // ═══ FUNCTION DETECTION ═══
 function detectFunction(text) {
-  // Look for f(x)=... or y=... patterns
   const patterns = [
-    /f\(x\)\s*=\s*([^\n,;]+)/i,
-    /y\s*=\s*([^\n,;(]+)/i,
-    /GeoGebra[:\s]+f\(x\)=([^\n,]+)/i,
-    /grafica[^:]*:\s*f\(x\)=([^\n,]+)/i,
+    /GeoGebra[:\s]*f\(x\)=([^\n,]+)/i,
+    /GeoGebra[:\s]*f\(x\)\s*=\s*([^\n,]+)/i,
+    /studia\s+f\(x\)\s*=\s*([^,\n;]+)/i,
+    /studiamo\s+f\(x\)\s*=\s*([^,\n;]+)/i,
+    /f\(x\)\s*=\s*([^,\n;\\]+)/i,
+    /y\s*=\s*([^,\n;(\\]{3,60})/i,
   ];
   for (const p of patterns) {
     const m = text.match(p);
     if (m) {
-      let fn = m[1].trim().replace(/\\[a-z]+/g,'').replace(/[\[\]{}]/g,'');
-      if (fn.length > 2 && fn.length < 80) return fn;
+      let fn = m[1].trim()
+        .replace(/\\[a-zA-Z]+/g,'').replace(/[\[\]{}]/g,'')
+        .replace(/\s+/g,'');
+      if (fn.length > 2 && fn.length < 100 && fn.includes('x')) return fn;
     }
   }
   return null;
+}
+
+function autoInjectAsymptotes(text) {
+  if (!ggbReady || !window.ggb) return;
+  let cmdIdx = 0;
+  // Vertical asymptotes x=c
+  const avRe = /[Aa]sintot[oi]\s+[Vv]ertic[ae][li][^:]*:\s*x\s*=\s*([\d.\-\/]+)/g;
+  let m;
+  while ((m = avRe.exec(text)) !== null) {
+    try { window.ggb.evalCommand('av'+(cmdIdx++)+'=Line(x='+m[1]+')'); } catch(e){}
+    try { window.ggb.evalCommand('x='+m[1]); } catch(e){}
+  }
+  // Oblique asymptote y=mx+q
+  const aoRe = /[Aa]sintot[oi]\s+[Oo]bliqui[oa]?[^:]*:\s*y\s*=\s*([x\d.\-\+\*\/\s]+)/;
+  const ao = text.match(aoRe);
+  if (ao) {
+    try { window.ggb.evalCommand('g(x)='+ao[1].replace(/\s/g,'')); } catch(e){}
+  }
+  // Horizontal asymptote y=L
+  const ahRe = /[Aa]sintot[oi]\s+[Oo]rizzont[ae][li][^:]*:\s*y\s*=\s*([\d.\-]+)/;
+  const ah = text.match(ahRe);
+  if (ah) {
+    try { window.ggb.evalCommand('h(x)='+ah[1]); } catch(e){}
+  }
 }
 
 // init

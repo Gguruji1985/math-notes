@@ -3,1085 +3,997 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MateSolver — Risolvi Problemi Passo per Passo</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<title>MateSolver — Analisi Matematica</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="window._katexReady=true"></script>
+<script src="https://www.geogebra.org/apps/deployggb.js"></script>
 <style>
-:root{
-  --bg:#0b0c0e;--bg2:#111215;--surface:#15171b;--surface2:#1c1f26;
-  --border:#252830;--border2:#2f3340;
-  --accent:#e8c547;--accent2:#5b8af0;--green:#4ade80;--red:#f87171;
-  --text:#e2e4ea;--muted:#636878;--muted2:#8b91a0;
+/* ═══ TOKENS ═══ */
+:root {
+  --bg:#0c0c0f; --bg2:#101013; --surface:#15151a; --surface2:#1c1c23;
+  --border:#242430; --border2:#30303e;
+  --accent:#e8b84b; --accent-dim:rgba(232,184,75,.12); --accent2:#6b8fff;
+  --green:#4ade80; --red:#f87171;
+  --text:#e2e2ec; --muted:#545462; --muted2:#868698;
+  --r:10px; --fz:14px;
+  --shadow:0 8px 32px rgba(0,0,0,.5);
+  --glow:0 0 24px rgba(232,184,75,.15);
+  --font-body:'Outfit',sans-serif;
+  --font-display:'DM Serif Display',serif;
+  --font-mono:'JetBrains Mono',monospace;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;}
+[data-theme="parchment"] {
+  --bg:#f2ece0; --bg2:#e9e2d3; --surface:#faf5ea; --surface2:#ede6d4;
+  --border:#d0c5ae; --border2:#bfb09a;
+  --accent:#b5701a; --accent-dim:rgba(181,112,26,.1); --accent2:#3a5abf;
+  --green:#1e7a42; --red:#c0392b;
+  --text:#1a1812; --muted:#8a7d68; --muted2:#6a5d4a;
+  --shadow:0 8px 32px rgba(0,0,0,.1);
+  --glow:0 0 24px rgba(181,112,26,.12);
+}
+[data-theme="aurora"] {
+  --bg:#07070d; --bg2:#0b0c18; --surface:#0f1020; --surface2:#151628;
+  --border:#1c1e36; --border2:#262848;
+  --accent:#a78bfa; --accent-dim:rgba(167,139,250,.12); --accent2:#22d3ee;
+  --green:#34d399; --red:#fb7185;
+  --text:#dde0f4; --muted:#42446a; --muted2:#72769a;
+  --shadow:0 8px 32px rgba(0,0,0,.7);
+  --glow:0 0 24px rgba(167,139,250,.18);
+}
+[data-theme="midnight"] {
+  --bg:#060a12; --bg2:#0a1020; --surface:#0e1628; --surface2:#141e34;
+  --border:#1a2640; --border2:#243450;
+  --accent:#38bdf8; --accent-dim:rgba(56,189,248,.12); --accent2:#818cf8;
+  --green:#34d399; --red:#fb7185;
+  --text:#ccd6f6; --muted:#3a4a6a; --muted2:#6a7a9a;
+  --shadow:0 8px 32px rgba(0,0,0,.7);
+  --glow:0 0 24px rgba(56,189,248,.18);
+}
+[data-theme="forest"] {
+  --bg:#060d09; --bg2:#0a1410; --surface:#0e1a13; --surface2:#132119;
+  --border:#1a2e20; --border2:#243d2c;
+  --accent:#4ade80; --accent-dim:rgba(74,222,128,.12); --accent2:#34d399;
+  --green:#4ade80; --red:#fb7185;
+  --text:#d0f0d8; --muted:#2e4a38; --muted2:#5a7a62;
+  --shadow:0 8px 32px rgba(0,0,0,.7);
+  --glow:0 0 24px rgba(74,222,128,.18);
+}
+[data-theme="rose"] {
+  --bg:#100808; --bg2:#180c0c; --surface:#1e1010; --surface2:#261616;
+  --border:#341e1e; --border2:#422828;
+  --accent:#f472b6; --accent-dim:rgba(244,114,182,.12); --accent2:#fb923c;
+  --green:#4ade80; --red:#fb7185;
+  --text:#fce7f3; --muted:#5a2a3a; --muted2:#8a5a6a;
+  --shadow:0 8px 32px rgba(0,0,0,.7);
+  --glow:0 0 24px rgba(244,114,182,.18);
+}
+[data-theme="slate"] {
+  --bg:#0e1117; --bg2:#131820; --surface:#181f2a; --surface2:#1e2634;
+  --border:#262e3e; --border2:#30384e;
+  --accent:#94a3b8; --accent-dim:rgba(148,163,184,.12); --accent2:#60a5fa;
+  --green:#4ade80; --red:#fb7185;
+  --text:#e2e8f0; --muted:#3a4258; --muted2:#64748b;
+  --shadow:0 8px 32px rgba(0,0,0,.6);
+  --glow:0 0 24px rgba(148,163,184,.15);
+}
+[data-theme="crimson"] {
+  --bg:#0d0608; --bg2:#150a0c; --surface:#1a0d10; --surface2:#221218;
+  --border:#341820; --border2:#42202a;
+  --accent:#f43f5e; --accent-dim:rgba(244,63,94,.12); --accent2:#fb923c;
+  --green:#4ade80; --red:#fb7185;
+  --text:#ffe4e6; --muted:#5a2030; --muted2:#8a4060;
+  --shadow:0 8px 32px rgba(0,0,0,.7);
+  --glow:0 0 24px rgba(244,63,94,.18);
+}
+[data-theme="latte"] {
+  --bg:#fdf6ee; --bg2:#f5ede0; --surface:#fff9f3; --surface2:#ede3d5;
+  --border:#d8cbb8; --border2:#c4b4a0;
+  --accent:#7c5c3a; --accent-dim:rgba(124,92,58,.1); --accent2:#5b7abf;
+  --green:#2a6e3e; --red:#b83232;
+  --text:#2a1e12; --muted:#8a7060; --muted2:#6a5848;
+  --shadow:0 8px 32px rgba(0,0,0,.1);
+  --glow:0 0 24px rgba(124,92,58,.12);
+}
 
-/* SETUP */
-#screen-setup{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;}
-.setup-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:40px;width:460px;max-width:95vw;}
-.setup-logo{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--accent);letter-spacing:-.02em;margin-bottom:4px;}
-.setup-logo span{color:var(--text);}
-.setup-desc{font-size:.82rem;color:var(--muted2);margin-bottom:28px;line-height:1.5;}
-.setup-label{font-size:.65rem;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px;}
-.provider-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
-.prov-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--muted2);font-family:'DM Mono',monospace;font-size:.75rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;}
-.prov-btn:hover{border-color:var(--border2);color:var(--text);}
-.prov-btn.active{background:#1a1d26;border-color:var(--accent);color:var(--accent);}
-.prov-info{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:.75rem;line-height:1.6;}
-.prov-model{color:var(--accent);font-family:'DM Mono',monospace;font-size:.65rem;font-weight:700;}
-.prov-link{color:var(--muted2);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:var(--font-body);background:var(--bg);color:var(--text);overflow:hidden;font-size:var(--fz);transition:background .35s,color .35s;}
+
+/* ═══ ONBOARDING ═══ */
+#onboarding{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:300;transition:opacity .4s;}
+#onboarding.hidden{opacity:0;pointer-events:none;}
+
+.ob-wrap{width:500px;max-width:95vw;}
+.ob-logo-block{text-align:center;margin-bottom:36px;}
+.ob-logo{font-family:var(--font-display);font-size:2.6rem;color:var(--accent);letter-spacing:-.02em;display:block;}
+.ob-logo span{color:var(--text);}
+.ob-tagline{font-size:.8rem;color:var(--muted2);font-weight:300;margin-top:4px;letter-spacing:.01em;}
+
+.ob-card{background:var(--surface);border:1px solid var(--border2);border-radius:18px;padding:32px 36px;position:relative;overflow:hidden;}
+.ob-card::before{content:'';position:absolute;top:-80px;right:-80px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,var(--accent-dim) 0%,transparent 70%);pointer-events:none;}
+
+.ob-label{font-size:.6rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.ob-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.prov-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.prov-btn{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--muted2);font-family:var(--font-mono);font-size:.72rem;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:8px;}
+.prov-btn:hover{border-color:var(--border2);color:var(--text);transform:translateY(-1px);}
+.prov-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.prov-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+.prov-info{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;margin-bottom:16px;font-size:.76rem;line-height:1.7;}
+.prov-model{color:var(--accent);font-family:var(--font-mono);font-size:.65rem;font-weight:700;margin-bottom:2px;}
 .prov-link a{color:var(--accent2);text-decoration:none;}
-.api-input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:.82rem;padding:11px 14px;border-radius:8px;outline:none;transition:border-color .15s;margin-bottom:8px;}
-.api-input:focus{border-color:var(--accent2);}
+
+.api-wrap{position:relative;margin-bottom:10px;}
+.api-input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:.82rem;padding:12px 42px 12px 14px;border-radius:10px;outline:none;transition:border-color .2s,box-shadow .2s;}
+.api-input:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(107,143,255,.1);}
 .api-input::placeholder{color:var(--muted);}
-.save-row{display:flex;align-items:center;gap:8px;margin-bottom:20px;font-size:.75rem;color:var(--muted2);}
-.save-row input[type=checkbox]{accent-color:var(--accent);cursor:pointer;}
-.start-btn{width:100%;background:var(--accent);color:#0b0c0e;border:none;border-radius:8px;padding:13px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.95rem;cursor:pointer;transition:background .15s;}
-.start-btn:hover{background:#f0d060;}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:.95rem;transition:color .15s;line-height:1;}
+.eye-btn:hover{color:var(--text);}
 
-/* MAIN */
-#screen-main{display:none;grid-template-columns:240px 1fr 370px;grid-template-rows:52px 1fr;height:100vh;}
-#screen-main.visible{display:grid;}
+.save-row{display:flex;align-items:center;gap:9px;margin-bottom:22px;font-size:.78rem;color:var(--muted2);cursor:pointer;user-select:none;}
+.save-row input{accent-color:var(--accent);}
 
-/* TOPBAR */
-.topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;}
-.topbar-logo{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--accent);letter-spacing:-.02em;}
-.topbar-logo span{color:var(--text);}
-.topbar-tag{font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace;}
-.topbar-tabs{display:flex;gap:4px;margin-left:auto;}
-.tab-btn{background:none;border:1px solid transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.78rem;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .15s;}
+.start-btn{width:100%;background:var(--accent);color:#0c0c0f;border:none;border-radius:10px;padding:14px;font-family:var(--font-body);font-weight:600;font-size:.95rem;cursor:pointer;transition:all .2s;letter-spacing:.015em;}
+.start-btn:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:var(--glow);}
+
+/* ═══ APP LAYOUT ═══ */
+#app{display:none;height:100vh;grid-template-rows:50px 1fr;grid-template-columns:216px 1fr 336px;}
+#app.visible{display:grid;}
+
+/* ═══ TOPBAR ═══ */
+.topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;z-index:10;}
+.logo{font-family:var(--font-display);font-size:1.2rem;color:var(--accent);letter-spacing:-.02em;text-decoration:none;flex-shrink:0;}
+.logo span{color:var(--text);}
+.topbar-sub{font-size:.65rem;color:var(--muted);font-family:var(--font-mono);flex-shrink:0;}
+.topbar-tabs{display:flex;gap:3px;margin-left:auto;}
+.tab-btn{background:none;border:1px solid transparent;color:var(--muted);font-family:var(--font-body);font-size:.78rem;padding:5px 13px;border-radius:7px;cursor:pointer;transition:all .15s;}
 .tab-btn.active{background:var(--surface2);border-color:var(--border);color:var(--text);}
 .tab-btn:hover:not(.active){color:var(--text);}
-.prov-badge{font-size:.65rem;font-family:'DM Mono',monospace;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--muted2);cursor:pointer;transition:all .15s;}
-.prov-badge:hover{border-color:var(--accent);color:var(--accent);}
+.topbar-actions{display:flex;gap:5px;margin-left:8px;}
+.icon-btn{width:30px;height:30px;border-radius:7px;background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .15s;}
+.icon-btn:hover{border-color:var(--border2);color:var(--text);background:var(--surface2);}
+.prov-pill{font-size:.62rem;font-family:var(--font-mono);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;color:var(--muted2);cursor:pointer;transition:all .15s;white-space:nowrap;margin-left:4px;}
+.prov-pill:hover{border-color:var(--accent);color:var(--accent);}
 
-/* SIDEBAR */
-.sidebar{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:14px 10px;}
-.side-title{font-size:.6rem;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:0 8px 8px;margin-top:4px;}
-.topic-btn{width:100%;text-align:left;background:none;border:none;color:var(--muted2);font-family:'DM Sans',sans-serif;font-size:.8rem;padding:7px 10px;border-radius:6px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;line-height:1.3;}
+/* ═══ SIDEBAR ═══ */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;}
+.sidebar-sect{padding:14px 10px 4px;}
+.s-label{font-size:.58rem;font-family:var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.13em;padding:0 8px 8px;}
+.topic-btn{width:100%;text-align:left;background:none;border:none;color:var(--muted2);font-family:var(--font-body);font-size:.79rem;padding:7px 10px;border-radius:7px;cursor:pointer;transition:all .14s;display:flex;align-items:center;gap:9px;line-height:1.3;}
 .topic-btn:hover{background:var(--surface2);color:var(--text);}
-.topic-btn.active{background:var(--surface2);color:var(--accent);}
-.topic-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:background .15s;}
-.topic-btn.active .topic-dot{background:var(--accent);}
-.side-div{border:none;border-top:1px solid var(--border);margin:8px 0;}
+.topic-btn.active{background:var(--accent-dim);color:var(--accent);}
+.tdot{width:4px;height:4px;border-radius:2px;background:var(--border2);flex-shrink:0;transition:background .14s;}
+.topic-btn.active .tdot{background:var(--accent);}
+.sdiv{border:none;border-top:1px solid var(--border);margin:8px 0;}
 
-/* MAIN AREA */
-.main-area{display:flex;flex-direction:column;overflow:hidden;}
+/* FARF */
+.farf-sect{padding:10px 14px 4px;}
+.farf-acronym{display:flex;align-items:center;gap:5px;margin-bottom:10px;}
+.farf-letter{width:30px;height:30px;border-radius:7px;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.95rem;color:var(--accent);cursor:default;transition:all .2s;}
+.farf-letter:hover{border-color:var(--accent);transform:translateY(-2px);}
+.farf-sep{color:var(--border2);font-size:.75rem;}
+.farf-progress{height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-bottom:8px;}
+.farf-bar{height:100%;background:var(--accent);transition:width .45s ease;width:0%;}
+.farf-steps{display:flex;flex-direction:column;gap:2px;padding:0 10px 6px;}
+.farf-step{width:100%;background:none;border:none;display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:7px;cursor:pointer;transition:all .14s;text-align:left;}
+.farf-step:hover{background:var(--surface2);}
+.farf-step.active{background:var(--accent-dim);}
+.farf-n{width:19px;height:19px;border-radius:5px;background:var(--border2);font-family:var(--font-mono);font-size:.62rem;font-weight:700;color:var(--muted2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .14s;}
+.farf-step.active .farf-n{background:var(--accent);color:#0c0c0f;}
+.farf-step-name{font-size:.77rem;color:var(--muted2);}
+.farf-step.active .farf-step-name{color:var(--accent);}
+.farf-all-btn{margin:4px 10px 12px;width:calc(100% - 20px);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--muted2);font-family:var(--font-body);font-size:.77rem;cursor:pointer;transition:all .15s;text-align:center;}
+.farf-all-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.farf-all-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+
+/* ═══ MAIN AREA ═══ */
+.main-area{display:flex;flex-direction:column;overflow:hidden;position:relative;}
 .panel{display:none;flex-direction:column;height:100%;overflow:hidden;}
 .panel.active{display:flex;}
 
-/* CHAT */
-.chat-scroll{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:0;}
-.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:10px;color:var(--muted);}
-.welcome-icon{font-size:2.5rem;margin-bottom:4px;}
-.welcome h2{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--text);font-weight:400;}
-.welcome p{font-size:.82rem;max-width:380px;line-height:1.6;}
-.welcome code{font-family:'DM Mono',monospace;color:var(--accent2);font-size:.76rem;}
-.msgs{display:flex;flex-direction:column;gap:18px;}
-.msg{display:flex;flex-direction:column;gap:5px;}
-.msg-label{font-size:.6rem;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
-.msg.user .msg-label{color:var(--accent2);}
-.bubble{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:13px 15px;font-size:.86rem;line-height:1.75;}
-.msg.user .bubble{background:#141b2e;border-color:#1f2f50;font-family:'DM Mono',monospace;font-size:.78rem;}
-.step{border-left:2px solid var(--accent);padding:8px 12px;margin:10px 0;background:rgba(232,197,71,.05);border-radius:0 6px 6px 0;}
-.step-n{font-size:.6rem;font-family:'DM Mono',monospace;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
-.result-box{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:10px 14px;margin-top:10px;font-family:'DM Mono',monospace;font-size:.82rem;color:var(--green);}
-.error-box{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:10px 14px;margin-top:6px;font-size:.82rem;color:var(--red);}
-.bubble .katex-display{margin:10px 0;overflow-x:auto;}
-.bubble .katex{font-size:1em;}
-.typing{display:flex;gap:4px;align-items:center;padding:4px 0;}
+/* WELCOME */
+.chat-scroll{flex:1;overflow-y:auto;padding:28px 28px 12px;display:flex;flex-direction:column;}
+.welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:40px;}
+.welcome-glyph{font-family:var(--font-display);font-size:5rem;color:var(--accent);opacity:.2;line-height:1;margin-bottom:4px;user-select:none;}
+.welcome h2{font-family:var(--font-display);font-size:1.7rem;font-weight:400;}
+.welcome p{font-size:.82rem;color:var(--muted2);max-width:380px;line-height:1.75;font-weight:300;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;}
+.chip{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:.73rem;color:var(--muted2);cursor:pointer;transition:all .15s;font-family:var(--font-mono);}
+.chip:hover{border-color:var(--accent);color:var(--accent);}
+
+/* MESSAGES */
+.msgs{display:flex;flex-direction:column;gap:24px;}
+.msg{display:flex;flex-direction:column;gap:6px;animation:fadeUp .22s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.msg-hd{display:flex;align-items:center;gap:8px;}
+.msg-av{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;font-family:var(--font-mono);}
+.msg.user .msg-av{background:rgba(107,143,255,.14);color:var(--accent2);}
+.msg.ai .msg-av{background:var(--accent-dim);color:var(--accent);}
+.msg-lbl{font-size:.6rem;font-family:var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.msg-acts{margin-left:auto;display:flex;gap:3px;opacity:0;transition:opacity .14s;}
+.msg:hover .msg-acts{opacity:1;}
+.act-btn{width:22px;height:22px;border-radius:5px;background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem;transition:all .14s;}
+.act-btn:hover{border-color:var(--border2);color:var(--text);}
+
+.bubble{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:.85rem;line-height:1.85;}
+.msg.user .bubble{background:rgba(107,143,255,.06);border-color:rgba(107,143,255,.18);font-family:var(--font-mono);font-size:.79rem;}
+.step{border-left:2px solid var(--accent);padding:8px 12px;margin:10px 0;background:rgba(232,184,75,.04);border-radius:0 8px 8px 0;}
+.step-lbl{font-size:.57rem;font-family:var(--font-mono);color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.result-box{background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:10px 14px;margin-top:12px;font-family:var(--font-mono);font-size:.79rem;color:var(--green);}
+.error-box{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:10px 14px;margin-top:6px;font-size:.82rem;color:var(--red);}
+.typing{display:flex;gap:5px;align-items:center;padding:4px 0;}
 .dot{width:5px;height:5px;background:var(--muted);border-radius:50%;animation:bop 1.2s infinite;}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
-@keyframes bop{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+@keyframes bop{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
 
-/* INPUT */
-.input-bar{border-top:1px solid var(--border);padding:14px 24px;background:var(--surface);display:flex;flex-direction:column;gap:8px;}
-.topic-hint{font-size:.68rem;font-family:'DM Mono',monospace;color:var(--muted);}
-.topic-hint b{color:var(--accent);}
-.input-row{display:flex;gap:8px;align-items:flex-end;}
-.problem-input{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:.83rem;padding:11px 13px;border-radius:8px;resize:none;min-height:44px;max-height:120px;outline:none;transition:border-color .15s;line-height:1.5;}
-.problem-input:focus{border-color:var(--accent2);}
-.problem-input::placeholder{color:var(--muted);}
-.send-btn{background:var(--accent);color:#0b0c0e;border:none;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.82rem;padding:11px 18px;border-radius:8px;cursor:pointer;transition:background .15s;white-space:nowrap;height:44px;}
-.send-btn:hover{background:#f0d060;}
-.send-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+/* INPUT ZONE */
+.input-zone{border-top:1px solid var(--border);padding:12px 20px;background:var(--surface);}
+.topic-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-dim);border:1px solid rgba(232,184,75,.25);border-radius:20px;padding:3px 10px;font-size:.65rem;font-family:var(--font-mono);color:var(--accent);margin-bottom:9px;}
+.topic-clear{cursor:pointer;opacity:.65;transition:opacity .14s;font-style:normal;}
+.topic-clear:hover{opacity:1;}
+.topic-empty{font-size:.68rem;color:var(--muted);margin-bottom:8px;font-family:var(--font-mono);}
+.input-row{display:flex;gap:7px;align-items:flex-end;}
+.kbd-tog{width:34px;height:38px;flex-shrink:0;border-radius:8px;background:var(--surface2);border:1px solid var(--border);color:var(--muted2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .15s;}
+.kbd-tog:hover{border-color:var(--border2);color:var(--text);}
+.kbd-tog.on{border-color:var(--accent2);color:var(--accent2);background:rgba(107,143,255,.08);}
+.prob-in{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:.81rem;padding:10px 13px;border-radius:9px;resize:none;min-height:38px;max-height:120px;outline:none;transition:border-color .2s,box-shadow .2s;line-height:1.5;}
+.prob-in:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(107,143,255,.1);}
+.prob-in::placeholder{color:var(--muted);}
+.send-btn{height:38px;background:var(--accent);color:#0c0c0f;border:none;border-radius:9px;padding:0 18px;font-family:var(--font-body);font-weight:600;font-size:.82rem;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;}
+.send-btn:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.send-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none;filter:none;}
+
+/* KEYBOARD */
+.kbd-wrap{padding:0 20px 10px;background:var(--surface);display:none;}
+.kbd-wrap.on{display:block;}
+.kbd-tabs{display:flex;gap:4px;margin-bottom:7px;}
+.kbd-tab{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:var(--font-mono);font-size:.65rem;padding:4px 10px;cursor:pointer;transition:all .14s;}
+.kbd-tab.active{background:var(--surface2);border-color:var(--border2);color:var(--text);}
+.kbd-pg{display:none;}
+.kbd-pg.active{display:flex;flex-direction:column;gap:5px;}
+.kbd-row{display:flex;gap:4px;}
+.k{background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:var(--font-mono);font-size:.81rem;min-width:32px;height:34px;padding:0 4px;cursor:pointer;transition:all .1s;display:flex;align-items:center;justify-content:center;flex:1;}
+.k:hover{background:var(--bg2);border-color:var(--accent2);}
+.k:active{transform:scale(.93);}
+.k.wide{flex:2;}.k.op{color:var(--accent);background:rgba(232,184,75,.05);}
+.k.act{background:rgba(107,143,255,.08);color:var(--accent2);}
+.k.del{background:rgba(248,113,113,.06);color:var(--red);}
+.k.ent{background:rgba(74,222,128,.07);color:var(--green);flex:1.5;}
 
 /* NOTES */
-.notes-scroll{flex:1;overflow-y:auto;padding:22px 26px;}
-.notes-title{font-family:'DM Serif Display',serif;font-size:1.35rem;font-weight:400;margin-bottom:3px;}
-.notes-sub{font-size:.75rem;color:var(--muted2);margin-bottom:22px;}
+.notes-scroll{flex:1;overflow-y:auto;padding:26px 28px;}
+.notes-title{font-family:var(--font-display);font-size:1.5rem;font-weight:400;margin-bottom:4px;}
+.notes-sub{font-size:.75rem;color:var(--muted2);margin-bottom:24px;font-weight:300;}
 .note-sec{margin-bottom:26px;}
-.note-sec-title{font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--border);}
-.note-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:13px 15px;margin-bottom:8px;font-size:.83rem;line-height:1.8;}
-.note-card p{margin-bottom:5px;}
-.note-card p:last-child{margin-bottom:0;}
+.note-sec-t{font-family:var(--font-mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.note-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;font-size:.83rem;line-height:1.9;}
+.note-card p{margin-bottom:4px;}.note-card p:last-child{margin-bottom:0;}
 
-/* GEOGEBRA */
+/* GEO */
 .geo-panel{border-left:1px solid var(--border);display:flex;flex-direction:column;background:var(--surface);}
-.geo-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.geo-title{font-size:.7rem;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
-.geo-btn{margin-left:auto;background:var(--surface2);border:1px solid var(--border);color:var(--muted2);font-family:'DM Sans',sans-serif;font-size:.72rem;padding:5px 10px;border-radius:5px;cursor:pointer;transition:all .15s;}
-.geo-btn:hover{color:var(--text);border-color:var(--accent2);}
-#geo-frame{flex:1;border:none;background:#fff;}
+.geo-hd{padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.geo-title{font-size:.65rem;font-family:var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.geo-acts{margin-left:auto;display:flex;gap:4px;}
+.geo-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted2);font-family:var(--font-body);font-size:.7rem;padding:4px 10px;border-radius:6px;cursor:pointer;transition:all .14s;}
+.geo-btn:hover{color:var(--text);border-color:var(--border2);}
 
-/* FARF tiles */
-.farf-bar{
-  display:flex;align-items:center;justify-content:center;
-  gap:6px;padding:10px 8px 8px;
-}
-.farf-letter{
-  width:36px;height:36px;border-radius:8px;
-  background:var(--surface2);border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'DM Serif Display',serif;font-size:1.1rem;
-  color:var(--accent);cursor:default;
-  transition:all .2s;
-}
-.farf-letter:hover{background:#1e2230;border-color:var(--accent);transform:translateY(-2px);}
-.farf-dot{color:var(--muted);font-size:.9rem;}
+/* HISTORY OVERLAY */
+.hist-panel{position:absolute;inset:0;background:var(--bg);z-index:5;display:none;flex-direction:column;padding:24px;}
+.hist-panel.on{display:flex;}
+.hist-back{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 14px;color:var(--muted2);cursor:pointer;font-family:var(--font-body);font-size:.78rem;margin-bottom:16px;transition:all .15s;}
+.hist-back:hover{color:var(--text);border-color:var(--border2);}
+.hist-title{font-family:var(--font-display);font-size:1.4rem;margin-bottom:16px;}
+.hist-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
+.hist-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s;}
+.hist-item:hover{border-color:var(--border2);background:var(--surface2);}
+.hist-q{font-size:.81rem;color:var(--text);font-family:var(--font-mono);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist-meta{font-size:.67rem;color:var(--muted);}
+.hist-empty{color:var(--muted);font-size:.83rem;text-align:center;margin-top:40px;}
 
-.farf-steps{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:6px 8px;}
-.farf-step{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:8px;padding:9px 8px;
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  cursor:pointer;transition:all .15s;text-align:center;
-}
-.farf-step:hover{border-color:var(--border2);background:#1e2230;}
-.farf-step.active{border-color:var(--accent);background:#1a1e2a;}
-.farf-n{
-  width:22px;height:22px;border-radius:50%;
-  background:var(--border2);
-  font-family:'DM Mono',monospace;font-size:.7rem;font-weight:700;
-  color:var(--muted2);display:flex;align-items:center;justify-content:center;
-  transition:all .15s;flex-shrink:0;
-}
-.farf-step.active .farf-n{background:var(--accent);color:#0b0c0e;}
-.farf-name{font-size:.72rem;color:var(--muted2);font-family:'DM Sans',sans-serif;line-height:1.2;}
-.farf-step.active .farf-name{color:var(--accent);}
+/* TWEAKS */
+.tweaks-panel{position:fixed;bottom:20px;right:20px;width:300px;background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:18px;z-index:200;box-shadow:var(--shadow);display:none;animation:fadeUp .2s ease;}
+.tweaks-panel.on{display:block;}
+.tweaks-hd{font-size:.62rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.tweaks-x{cursor:pointer;color:var(--muted);transition:color .14s;font-style:normal;}
+.tweaks-x:hover{color:var(--text);}
+.twk-g{margin-bottom:14px;}
+.twk-lbl{font-size:.68rem;color:var(--muted2);margin-bottom:7px;}
+.twk-btns{display:flex;gap:5px;}
+.twk-btn{flex:1;padding:7px 5px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--muted2);font-size:.7rem;cursor:pointer;transition:all .14s;text-align:center;font-family:var(--font-body);}
+.twk-btn:hover{border-color:var(--border2);color:var(--text);}
+.twk-btn.on{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.twk-slider{width:100%;accent-color:var(--accent);margin-top:2px;}
+.twk-rlbl{display:flex;justify-content:space-between;font-size:.62rem;color:var(--muted);margin-top:4px;}
+.theme-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+.theme-grid .twk-btn{display:flex;align-items:center;gap:5px;justify-content:flex-start;padding:6px 8px;}
+.th-swatch{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
-.farf-complete-btn{
-  width:calc(100% - 16px);margin:4px 8px 8px;
-  background:linear-gradient(135deg,#1a1e2a,#1e2234);
-  border:1px solid var(--accent);border-radius:8px;
-  color:var(--accent);font-family:'DM Mono',monospace;font-size:.75rem;
-  font-weight:700;letter-spacing:.05em;padding:10px;
-  cursor:pointer;transition:all .15s;
-}
-.farf-complete-btn:hover{background:linear-gradient(135deg,#1e2234,#222740);transform:translateY(-1px);}
-.farf-complete-btn.active{background:rgba(232,197,71,.15);}
-
-/* MATH KEYBOARD */
-.kbd-wrap{padding:0 24px 12px;background:var(--surface);border-top:1px solid var(--border);display:none;}
-.kbd-wrap.open{display:block;}
-.kbd-tabs{display:flex;gap:4px;margin-bottom:8px;}
-.kbd-tab{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:'DM Mono',monospace;font-size:.68rem;padding:4px 10px;cursor:pointer;transition:all .15s;}
-.kbd-tab.active{background:var(--surface2);border-color:var(--border2);color:var(--text);}
-.kbd-page{display:none;}
-.kbd-page.active{display:grid;gap:5px;}
-.kbd-row{display:flex;gap:5px;}
-.kbd-row.spaced{justify-content:flex-start;}
-.k{
-  background:var(--surface2);border:1px solid var(--border2);
-  border-radius:7px;color:var(--text);
-  font-family:'DM Mono',monospace;font-size:.85rem;
-  min-width:36px;height:38px;padding:0 6px;
-  cursor:pointer;transition:all .12s;
-  display:flex;align-items:center;justify-content:center;flex:1;
-}
-.k:hover{background:#252a36;border-color:var(--accent2);}
-.k:active{transform:scale(.93);}
-.k.wide{flex:2;}
-.k.op{color:var(--accent);background:#181c24;}
-.k.action{background:#1a1d26;color:var(--accent2);}
-.k.del{background:#1e1a22;color:var(--red);}
-.k.enter-k{background:#1a2035;color:var(--green);flex:1.5;}
-.kbd-toggle{
-  background:none;border:1px solid var(--border);border-radius:6px;
-  color:var(--muted2);font-size:.85rem;width:32px;height:32px;
-  cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;
-}
-.kbd-toggle:hover{border-color:var(--accent2);color:var(--accent2);}
-.kbd-toggle.open{border-color:var(--accent2);color:var(--accent2);background:var(--surface2);}
-
+/* SCROLLBAR */
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px;}
-@media(max-width:950px){#screen-main{grid-template-columns:1fr 320px;}.sidebar{display:none;}}
-@media(max-width:640px){#screen-main{grid-template-columns:1fr;}.geo-panel{display:none;}}
+
+/* RESPONSIVE */
+@media(max-width:960px){#app{grid-template-columns:1fr 300px;}.sidebar{display:none;}}
+@media(max-width:640px){#app{grid-template-columns:1fr;}.geo-panel{display:none;}}
 </style>
-<script src="https://www.geogebra.org/apps/deployggb.js"></script>
 </head>
 <body>
 
-<!-- ══ SETUP ══ -->
-<div id="screen-setup">
-  <div class="setup-card">
-    <div class="setup-logo">Mate<span>Solver</span></div>
-    <div class="setup-desc">Risolve problemi di matematica passo per passo usando i tuoi appunti.<br>Scegli un provider AI e inserisci la tua API key per iniziare.</div>
-    <div class="setup-label">Provider AI</div>
-    <div class="provider-row">
-      <button class="prov-btn active" id="tab-groq"      onclick="selectProvider('groq')">⚡ Groq (Gratis)</button>
-      <button class="prov-btn"        id="tab-anthropic" onclick="selectProvider('anthropic')">🟠 Anthropic</button>
-      <button class="prov-btn"        id="tab-openai"    onclick="selectProvider('openai')">🟢 OpenAI</button>
-      <button class="prov-btn"        id="tab-gemini"    onclick="selectProvider('gemini')">🔵 Gemini</button>
+<!-- ══════════ ONBOARDING ══════════ -->
+<div id="onboarding">
+  <div class="ob-wrap">
+    <div class="ob-logo-block">
+      <span class="ob-logo">Mate<span>Solver</span></span>
+      <div class="ob-tagline">Analisi matematica passo per passo — per la Maturità e oltre</div>
     </div>
-    <div class="prov-info">
-      <div class="prov-model" id="prov-model"></div>
-      <div class="prov-link"  id="prov-link"></div>
+    <div class="ob-card">
+      <div class="ob-label">Provider AI</div>
+      <div class="prov-grid">
+        <button class="prov-btn active" id="tab-groq" onclick="selectProvider('groq')"><span class="prov-dot" style="background:#22c55e"></span>Groq — Gratis</button>
+        <button class="prov-btn" id="tab-anthropic" onclick="selectProvider('anthropic')"><span class="prov-dot" style="background:#e8744a"></span>Anthropic</button>
+        <button class="prov-btn" id="tab-openai" onclick="selectProvider('openai')"><span class="prov-dot" style="background:#74aa9c"></span>OpenAI</button>
+        <button class="prov-btn" id="tab-gemini" onclick="selectProvider('gemini')"><span class="prov-dot" style="background:#4285f4"></span>Gemini</button>
+      </div>
+      <div class="prov-info">
+        <div class="prov-model" id="prov-model"></div>
+        <div class="prov-link" id="prov-link"></div>
+      </div>
+      <div class="ob-label">API Key</div>
+      <div class="api-wrap">
+        <input class="api-input" id="api-key-input" type="password" placeholder="" autocomplete="off">
+        <button class="eye-btn" id="eye-btn" onclick="toggleEye()">👁</button>
+      </div>
+      <label class="save-row"><input type="checkbox" id="save-key-cb" checked>Salva la chiave nel browser</label>
+      <button class="start-btn" onclick="startApp()">Inizia →</button>
     </div>
-    <div class="setup-label">API Key</div>
-    <input class="api-input" id="api-key-input" type="password" placeholder="" autocomplete="off">
-    <div class="save-row">
-      <input type="checkbox" id="save-key-cb" checked>
-      <label for="save-key-cb">Salva la API key nel browser (localStorage)</label>
-    </div>
-    <button class="start-btn" onclick="startApp()">Inizia →</button>
   </div>
 </div>
 
-<!-- ══ MAIN ══ -->
-<div id="screen-main">
+<!-- ══════════ APP ══════════ -->
+<div id="app">
+
+  <!-- TOPBAR -->
   <header class="topbar">
-    <div class="topbar-logo">Mate<span>Solver</span></div>
-    <div class="topbar-tag">analisi · limiti · studio di funzione</div>
+    <span class="logo">Mate<span>Solver</span></span>
+    <span class="topbar-sub">analisi · limiti · studio di funzione</span>
     <div class="topbar-tabs">
-      <button class="tab-btn active" onclick="switchPanel('solver',this)">⚡ Risolvi</button>
-      <button class="tab-btn"        onclick="switchPanel('notes',this)">📖 Appunti</button>
+      <button class="tab-btn active" onclick="switchPanel('solver',this)">Risolvi</button>
+      <button class="tab-btn" onclick="switchPanel('notes',this)">Appunti</button>
     </div>
-    <div class="prov-badge" id="prov-badge" onclick="document.getElementById('screen-setup').style.display='flex'" title="Cambia provider / API key"></div>
+    <div class="topbar-actions">
+      <button class="icon-btn" title="Impostazioni" onclick="showTweaks()">⚙</button>
+      <button class="icon-btn" title="Cronologia" onclick="toggleHist()">⏱</button>
+      <button class="icon-btn" title="Esporta chat" onclick="exportChat()">↓</button>
+      <button class="icon-btn" title="Nuova chat" onclick="newChat()">✦</button>
+    </div>
+    <div class="prov-pill" id="prov-badge" onclick="document.getElementById('onboarding').style.display='flex'"></div>
   </header>
 
+  <!-- SIDEBAR -->
   <nav class="sidebar">
-    <div class="side-title">Argomenti</div>
-    <button class="topic-btn" onclick="selectTopic(this,'Intervalli e Intorni')"><span class="topic-dot"></span>Intervalli e Intorni</button>
-    <button class="topic-btn" onclick="selectTopic(this,'Limiti Immediati')"><span class="topic-dot"></span>Limiti Immediati</button>
-    <button class="topic-btn" onclick="selectTopic(this,'Limiti 0/0 — Fattorizzazione')"><span class="topic-dot"></span>Limiti 0/0 — Fattorizzazione</button>
-    <button class="topic-btn" onclick="selectTopic(this,'Limiti Notevoli')"><span class="topic-dot"></span>Limiti Notevoli</button>
-    <button class="topic-btn" onclick="selectTopic(this,'Funzioni Continue')"><span class="topic-dot"></span>Funzioni Continue</button>
-    <hr class="side-div">
-    <div class="side-title">Studio di Funzione</div>
-
-    <!-- FARF acronym bar -->
-    <div class="farf-bar">
-      <span class="farf-letter" title="Forma / Dominio">F</span>
-      <span class="farf-dot">·</span>
-      <span class="farf-letter" title="Assi / Intersezioni">A</span>
-      <span class="farf-dot">·</span>
-      <span class="farf-letter" title="Reale / Segno">R</span>
-      <span class="farf-dot">·</span>
-      <span class="farf-letter" title="Funzione / Grafico">F</span>
+    <div class="sidebar-sect">
+      <div class="s-label">Argomenti</div>
+      <button class="topic-btn" onclick="selectTopic(this,'Intervalli e Intorni')"><span class="tdot"></span>Intervalli e Intorni</button>
+      <button class="topic-btn" onclick="selectTopic(this,'Limiti Immediati')"><span class="tdot"></span>Limiti Immediati</button>
+      <button class="topic-btn" onclick="selectTopic(this,'Limiti 0/0 — Fattorizzazione')"><span class="tdot"></span>Limiti 0/0 — Fattorizzazione</button>
+      <button class="topic-btn" onclick="selectTopic(this,'Limiti Notevoli')"><span class="tdot"></span>Limiti Notevoli</button>
+      <button class="topic-btn" onclick="selectTopic(this,'Funzioni Continue')"><span class="tdot"></span>Funzioni Continue</button>
     </div>
-
-    <!-- Step tiles -->
+    <hr class="sdiv">
+    <div class="farf-sect">
+      <div class="s-label">Studio di Funzione</div>
+      <div class="farf-progress"><div class="farf-bar" id="farf-bar"></div></div>
+    </div>
     <div class="farf-steps">
-      <button class="farf-step" onclick="selectTopic(this,'Dominio')">
-        <span class="farf-n">1</span>
-        <span class="farf-name">Dominio</span>
-      </button>
-      <button class="farf-step" onclick="selectTopic(this,'Intersezioni con gli Assi')">
-        <span class="farf-n">2</span>
-        <span class="farf-name">Intersezioni</span>
-      </button>
-      <button class="farf-step" onclick="selectTopic(this,'Studio del Segno')">
-        <span class="farf-n">3</span>
-        <span class="farf-name">Segno</span>
-      </button>
-      <button class="farf-step" onclick="selectTopic(this,'Simmetrie')">
-        <span class="farf-n">4</span>
-        <span class="farf-name">Simmetrie</span>
-      </button>
-      <button class="farf-step" onclick="selectTopic(this,'Asintoti Verticali')">
-        <span class="farf-n">5</span>
-        <span class="farf-name">A. Verticali</span>
-      </button>
-      <button class="farf-step" onclick="selectTopic(this,'Asintoto Obliquo / Orizzontale')">
-        <span class="farf-n">6</span>
-        <span class="farf-name">A. Obliqui</span>
-      </button>
+      <button class="farf-step" onclick="selectFarf(this,'Dominio',1)"><span class="farf-n">1</span><span class="farf-step-name">Dominio</span></button>
+      <button class="farf-step" onclick="selectFarf(this,'Intersezioni con gli Assi',2)"><span class="farf-n">2</span><span class="farf-step-name">Intersezioni</span></button>
+      <button class="farf-step" onclick="selectFarf(this,'Studio del Segno',3)"><span class="farf-n">3</span><span class="farf-step-name">Segno</span></button>
+      <button class="farf-step" onclick="selectFarf(this,'Simmetrie',4)"><span class="farf-n">4</span><span class="farf-step-name">Simmetrie</span></button>
+      <button class="farf-step" onclick="selectFarf(this,'Asintoti Verticali',5)"><span class="farf-n">5</span><span class="farf-step-name">A. Verticali</span></button>
+      <button class="farf-step" onclick="selectFarf(this,'Asintoto Obliquo / Orizzontale',6)"><span class="farf-n">6</span><span class="farf-step-name">A. Obliqui</span></button>
     </div>
-
-    <button class="farf-complete-btn" onclick="selectTopic(this,'FARF Completo')">
-      ★ FARF Completo
-    </button>
+    <button class="farf-all-btn" onclick="selectFarf(this,'FARF Completo',0)">★ FARF Completo</button>
   </nav>
 
+  <!-- MAIN -->
   <main class="main-area">
+    <!-- HISTORY OVERLAY -->
+    <div class="hist-panel" id="hist-panel">
+      <button class="hist-back" onclick="toggleHist()">← Torna alla chat</button>
+      <div class="hist-title">Cronologia</div>
+      <div class="hist-list" id="hist-list"></div>
+    </div>
+
+    <!-- SOLVER -->
     <div id="panel-solver" class="panel active">
       <div class="chat-scroll" id="chat-scroll">
         <div class="welcome" id="welcome">
-          <div class="welcome-icon">∫</div>
+          <div class="welcome-glyph">∫</div>
           <h2>Scrivi un problema</h2>
-          <p>Risolvo passo per passo senza saltare nessuno step, usando i tuoi appunti di analisi.</p>
-          <p style="margin-top:6px"><code>⚡ Groq è gratis — ottieni la chiave su console.groq.com</code></p>
+          <p>Risolvo passo per passo, senza saltare nessuno step, usando i tuoi appunti di analisi matematica.</p>
+          <div class="chips">
+            <div class="chip" onclick="useChip('lim(x→1) (x²-1)/(2x²-x-1)')">Limite 0/0</div>
+            <div class="chip" onclick="useChip('studia f(x)=(x³-3x²-x+3)/(x²-2x)')">Studio di funzione FARF</div>
+            <div class="chip" onclick="useChip('lim(x→0) sin(x)/x')">Limite notevole</div>
+            <div class="chip" onclick="useChip('lim(x→+∞) (3x²+1)/(x²-5)')">Limite all\'infinito</div>
+          </div>
         </div>
         <div class="msgs" id="msgs"></div>
       </div>
+
       <!-- MATH KEYBOARD -->
       <div class="kbd-wrap" id="kbd-wrap">
         <div class="kbd-tabs">
           <button class="kbd-tab active" onclick="kbdTab(this,'basic')">123</button>
           <button class="kbd-tab" onclick="kbdTab(this,'fx')">f(x)</button>
-          <button class="kbd-tab" onclick="kbdTab(this,'greek')">ABC</button>
+          <button class="kbd-tab" onclick="kbdTab(this,'greek')">αβγ</button>
           <button class="kbd-tab" onclick="kbdTab(this,'ops')">#&¬</button>
         </div>
-
-        <!-- 123 page -->
-        <div class="kbd-page active" id="kp-basic">
+        <div class="kbd-pg active" id="kp-basic">
           <div class="kbd-row">
-            <button class="k" onclick="ki('x')">x</button>
-            <button class="k" onclick="ki('y')">y</button>
-            <button class="k" onclick="ki('z')">z</button>
-            <button class="k" onclick="ki('π')">π</button>
-            <button class="k op" onclick="ki('7')">7</button>
-            <button class="k op" onclick="ki('8')">8</button>
-            <button class="k op" onclick="ki('9')">9</button>
-            <button class="k op" onclick="ki('×')">×</button>
-            <button class="k op" onclick="ki('÷')">÷</button>
+            <button class="k" onclick="ki('x')">x</button><button class="k" onclick="ki('y')">y</button><button class="k" onclick="ki('π')">π</button><button class="k" onclick="ki('e')">e</button>
+            <button class="k op" onclick="ki('7')">7</button><button class="k op" onclick="ki('8')">8</button><button class="k op" onclick="ki('9')">9</button><button class="k op" onclick="ki('×')">×</button><button class="k op" onclick="ki('÷')">÷</button>
           </div>
           <div class="kbd-row">
-            <button class="k" onclick="ki('^2')">x²</button>
-            <button class="k" onclick="ki('^')">xⁿ</button>
-            <button class="k" onclick="ki('√(')">√</button>
-            <button class="k" onclick="ki('e')">e</button>
-            <button class="k op" onclick="ki('4')">4</button>
-            <button class="k op" onclick="ki('5')">5</button>
-            <button class="k op" onclick="ki('6')">6</button>
-            <button class="k op" onclick="ki('+')">+</button>
-            <button class="k op" onclick="ki('-')">−</button>
+            <button class="k" onclick="ki('^2')">x²</button><button class="k" onclick="ki('^')">xⁿ</button><button class="k" onclick="ki('√(')">√</button><button class="k" onclick="ki('/')"> / </button>
+            <button class="k op" onclick="ki('4')">4</button><button class="k op" onclick="ki('5')">5</button><button class="k op" onclick="ki('6')">6</button><button class="k op" onclick="ki('+')">+</button><button class="k op" onclick="ki('-')">−</button>
           </div>
           <div class="kbd-row">
-            <button class="k" onclick="ki('<')">&lt;</button>
-            <button class="k" onclick="ki('>')">&gt;</button>
-            <button class="k" onclick="ki('≤')">≤</button>
-            <button class="k" onclick="ki('≥')">≥</button>
-            <button class="k op" onclick="ki('1')">1</button>
-            <button class="k op" onclick="ki('2')">2</button>
-            <button class="k op" onclick="ki('3')">3</button>
-            <button class="k op" onclick="ki('=')">=</button>
-            <button class="k del" onclick="kbsDel()">⌫</button>
+            <button class="k" onclick="ki('(')">( </button><button class="k" onclick="ki(')')"> )</button><button class="k" onclick="ki('≤')">≤</button><button class="k" onclick="ki('≥')">≥</button>
+            <button class="k op" onclick="ki('1')">1</button><button class="k op" onclick="ki('2')">2</button><button class="k op" onclick="ki('3')">3</button><button class="k op" onclick="ki('=')">=</button><button class="k del" onclick="kbsDel()">⌫</button>
           </div>
           <div class="kbd-row">
-            <button class="k" onclick="ki('(')">( </button>
-            <button class="k" onclick="ki(')')"> )</button>
-            <button class="k" onclick="ki('|')">|x|</button>
-            <button class="k" onclick="ki(',')"> , </button>
-            <button class="k op wide" onclick="ki('0')">0</button>
-            <button class="k op" onclick="ki('.')"> . </button>
-            <button class="k action" onclick="kbsMove(-1)">◀</button>
-            <button class="k action" onclick="kbsMove(1)">▶</button>
-            <button class="k enter-k" onclick="sendProblem()">↵</button>
+            <button class="k" onclick="ki(',')"> , </button><button class="k" onclick="ki('|')">|·|</button><button class="k wide" onclick="ki('0')">0</button><button class="k" onclick="ki('.')">.</button>
+            <button class="k act" onclick="kbsMove(-1)">◀</button><button class="k act" onclick="kbsMove(1)">▶</button><button class="k ent" onclick="sendProblem()">↵</button>
           </div>
         </div>
-
-        <!-- f(x) page -->
-        <div class="kbd-page" id="kp-fx">
+        <div class="kbd-pg" id="kp-fx">
           <div class="kbd-row">
-            <button class="k" onclick="ki('lim(x→')">lim</button>
-            <button class="k" onclick="ki('→')">→</button>
-            <button class="k" onclick="ki('+∞')">+∞</button>
-            <button class="k" onclick="ki('-∞')">-∞</button>
-            <button class="k" onclick="ki('∞')">∞</button>
-            <button class="k" onclick="ki('0⁺')">0⁺</button>
-            <button class="k" onclick="ki('0⁻')">0⁻</button>
+            <button class="k" onclick="ki('lim(x→')">lim</button><button class="k" onclick="ki('+∞')">+∞</button><button class="k" onclick="ki('-∞')">-∞</button><button class="k" onclick="ki('0⁺')">0⁺</button><button class="k" onclick="ki('0⁻')">0⁻</button><button class="k" onclick="ki('→')">→</button>
           </div>
           <div class="kbd-row">
-            <button class="k" onclick="ki('sin(')">sin</button>
-            <button class="k" onclick="ki('cos(')">cos</button>
-            <button class="k" onclick="ki('tan(')">tan</button>
-            <button class="k" onclick="ki('ln(')">ln</button>
-            <button class="k" onclick="ki('log(')">log</button>
-            <button class="k" onclick="ki('e^(')">eˣ</button>
-            <button class="k" onclick="ki('|x|=')">|x|</button>
+            <button class="k" onclick="ki('sin(')">sin</button><button class="k" onclick="ki('cos(')">cos</button><button class="k" onclick="ki('tan(')">tan</button><button class="k" onclick="ki('ln(')">ln</button><button class="k" onclick="ki('log(')">log</button><button class="k" onclick="ki('e^(')">eˣ</button>
           </div>
           <div class="kbd-row">
-            <button class="k" onclick="ki('f(x)=')">f(x)=</button>
-            <button class="k" onclick="ki('y=')">y=</button>
-            <button class="k" onclick="ki('f\'(x)=')">f\'</button>
-            <button class="k" onclick="ki('∫(')">∫</button>
-            <button class="k" onclick="ki('√(')">√(</button>
-            <button class="k" onclick="ki('∛(')">∛(</button>
-            <button class="k" onclick="ki('/')">  /  </button>
+            <button class="k" onclick="ki('f(x)=')">f(x)=</button><button class="k" onclick="ki('y=')">y=</button><button class="k" onclick="ki('f\'(x)=')">f′</button><button class="k" onclick="ki('∫(')">∫</button><button class="k" onclick="ki('√(')">√(</button><button class="k" onclick="ki('/')">  /  </button>
           </div>
           <div class="kbd-row">
-            <button class="k wide" onclick="ki('FARF: y=')">FARF: y=</button>
-            <button class="k" onclick="ki('D: ∀x∈ℝ\\')">D:</button>
-            <button class="k" onclick="ki('∀x∈ℝ')">∀x∈ℝ</button>
-            <button class="k action" onclick="kbsMove(-1)">◀</button>
-            <button class="k action" onclick="kbsMove(1)">▶</button>
-            <button class="k del" onclick="kbsDel()">⌫</button>
-            <button class="k enter-k" onclick="sendProblem()">↵</button>
+            <button class="k wide" onclick="ki('FARF: y=')">FARF: y=</button><button class="k" onclick="ki('D: ∀x∈ℝ\\')">D:</button><button class="k" onclick="ki('∀x∈ℝ')">∀x∈ℝ</button>
+            <button class="k act" onclick="kbsMove(-1)">◀</button><button class="k act" onclick="kbsMove(1)">▶</button><button class="k del" onclick="kbsDel()">⌫</button><button class="k ent" onclick="sendProblem()">↵</button>
           </div>
         </div>
-
-        <!-- Greek page -->
-        <div class="kbd-page" id="kp-greek">
+        <div class="kbd-pg" id="kp-greek">
           <div class="kbd-row">
-            <button class="k" onclick="ki('α')">α</button>
-            <button class="k" onclick="ki('β')">β</button>
-            <button class="k" onclick="ki('γ')">γ</button>
-            <button class="k" onclick="ki('δ')">δ</button>
-            <button class="k" onclick="ki('ε')">ε</button>
-            <button class="k" onclick="ki('θ')">θ</button>
-            <button class="k" onclick="ki('λ')">λ</button>
+            <button class="k" onclick="ki('α')">α</button><button class="k" onclick="ki('β')">β</button><button class="k" onclick="ki('γ')">γ</button><button class="k" onclick="ki('δ')">δ</button><button class="k" onclick="ki('ε')">ε</button><button class="k" onclick="ki('θ')">θ</button><button class="k" onclick="ki('λ')">λ</button>
           </div>
           <div class="kbd-row">
-            <button class="k" onclick="ki('μ')">μ</button>
-            <button class="k" onclick="ki('σ')">σ</button>
-            <button class="k" onclick="ki('φ')">φ</button>
-            <button class="k" onclick="ki('ω')">ω</button>
-            <button class="k" onclick="ki('Δ')">Δ</button>
-            <button class="k" onclick="ki('Σ')">Σ</button>
-            <button class="k" onclick="ki('Π')">Π</button>
+            <button class="k" onclick="ki('ℝ')">ℝ</button><button class="k" onclick="ki('ℕ')">ℕ</button><button class="k" onclick="ki('ℤ')">ℤ</button><button class="k" onclick="ki('∈')">∈</button><button class="k" onclick="ki('∉')">∉</button><button class="k" onclick="ki('∩')">∩</button><button class="k" onclick="ki('∪')">∪</button>
           </div>
           <div class="kbd-row">
-            <button class="k" onclick="ki('ℝ')">ℝ</button>
-            <button class="k" onclick="ki('ℕ')">ℕ</button>
-            <button class="k" onclick="ki('ℤ')">ℤ</button>
-            <button class="k" onclick="ki('∈')">∈</button>
-            <button class="k" onclick="ki('∉')">∉</button>
-            <button class="k" onclick="ki('∩')">∩</button>
-            <button class="k" onclick="ki('∪')">∪</button>
+            <button class="k" onclick="ki('Δ')">Δ</button><button class="k" onclick="ki('Σ')">Σ</button><button class="k" onclick="ki('Π')">Π</button><button class="k" onclick="ki('∀')">∀</button><button class="k" onclick="ki('∃')">∃</button><button class="k" onclick="ki('{')">{ </button><button class="k" onclick="ki('}')"> }</button>
           </div>
           <div class="kbd-row">
-            <button class="k" onclick="ki('\\')">\\</button>
-            <button class="k" onclick="ki('{')">{ </button>
-            <button class="k" onclick="ki('}')"> }</button>
-            <button class="k" onclick="ki('∀')">∀</button>
-            <button class="k" onclick="ki('∃')">∃</button>
-            <button class="k action" onclick="kbsMove(-1)">◀</button>
-            <button class="k action" onclick="kbsMove(1)">▶</button>
-            <button class="k del" onclick="kbsDel()">⌫</button>
+            <button class="k" onclick="ki('\\')">\\</button><button class="k" onclick="ki('∴')">∴</button><button class="k" onclick="ki('⟹')">⟹</button>
+            <button class="k act" onclick="kbsMove(-1)">◀</button><button class="k act" onclick="kbsMove(1)">▶</button><button class="k del wide" onclick="kbsDel()">⌫</button>
           </div>
         </div>
-
-        <!-- ops page -->
-        <div class="kbd-page" id="kp-ops">
+        <div class="kbd-pg" id="kp-ops">
           <div class="kbd-row">
-            <button class="k" onclick="ki('≠')">≠</button>
-            <button class="k" onclick="ki('≈')">≈</button>
-            <button class="k" onclick="ki('±')">±</button>
-            <button class="k" onclick="ki('∓')">∓</button>
-            <button class="k" onclick="ki('·')">·</button>
-            <button class="k" onclick="ki('^3')">x³</button>
-            <button class="k" onclick="ki('⁰')">x⁰</button>
+            <button class="k" onclick="ki('≠')">≠</button><button class="k" onclick="ki('≈')">≈</button><button class="k" onclick="ki('±')">±</button><button class="k" onclick="ki('·')">·</button><button class="k" onclick="ki('^3')">x³</button><button class="k" onclick="ki('⁰')">x⁰</button>
           </div>
           <div class="kbd-row">
-            <button class="k" onclick="ki('→')">→</button>
-            <button class="k" onclick="ki('⟹')">⟹</button>
-            <button class="k" onclick="ki('⟺')">⟺</button>
-            <button class="k" onclick="ki('∴')">∴</button>
-            <button class="k" onclick="ki('∵')">∵</button>
-            <button class="k" onclick="ki('⊂')">⊂</button>
-            <button class="k" onclick="ki('⊃')">⊃</button>
+            <button class="k wide" onclick="ki('lim(x→+∞)')">lim +∞</button><button class="k wide" onclick="ki('lim(x→-∞)')">lim −∞</button><button class="k wide" onclick="ki('lim(x→0)')">lim 0</button>
           </div>
           <div class="kbd-row">
-            <button class="k wide" onclick="ki('x→')">x→</button>
-            <button class="k wide" onclick="ki('lim(x→+∞)')">lim+∞</button>
-            <button class="k wide" onclick="ki('lim(x→-∞)')">lim-∞</button>
-            <button class="k wide" onclick="ki('lim(x→0)')">lim 0</button>
-          </div>
-          <div class="kbd-row">
-            <button class="k action" onclick="kbsMove(-1)">◀</button>
-            <button class="k action" onclick="kbsMove(1)">▶</button>
-            <button class="k del wide" onclick="kbsDel()">⌫ Del</button>
-            <button class="k enter-k wide" onclick="sendProblem()">↵ Invia</button>
+            <button class="k act" onclick="kbsMove(-1)">◀</button><button class="k act" onclick="kbsMove(1)">▶</button><button class="k del wide" onclick="kbsDel()">⌫ Del</button><button class="k ent wide" onclick="sendProblem()">↵ Invia</button>
           </div>
         </div>
       </div>
 
-      <div class="input-bar">
-        <div class="topic-hint" id="topic-hint">Nessun argomento selezionato</div>
+      <div class="input-zone">
+        <div id="topic-area"></div>
         <div class="input-row">
-          <button class="kbd-toggle" id="kbd-toggle" onclick="toggleKbd()" title="Tastiera matematica">∑</button>
-          <textarea class="problem-input" id="problem-input"
-            placeholder="Es: lim(x→1) (x²-1)/(2x²-x-1)  oppure  studia f(x)=(x³-3x²-x+3)/(x²-2x)..."
-            rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="kbd-tog" id="kbd-tog" onclick="toggleKbd()" title="Tastiera matematica">∑</button>
+          <textarea class="prob-in" id="prob-in" placeholder="Es: lim(x→1) (x²-1)/(2x²-x-1)  ·  studia f(x)=(x³-3x²-x+3)/(x²-2x) ..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
           <button class="send-btn" id="send-btn" onclick="sendProblem()">Risolvi →</button>
         </div>
       </div>
     </div>
+
+    <!-- NOTES -->
     <div id="panel-notes" class="panel">
       <div class="notes-scroll" id="notes-content">
         <div class="notes-title">Seleziona un argomento</div>
-        <div class="notes-sub">Clicca un argomento nella barra laterale per vedere gli appunti scritti a mano.</div>
+        <div class="notes-sub">Clicca un argomento nella barra laterale.</div>
       </div>
     </div>
   </main>
 
-  <aside class="geo-panel">
-    <div class="geo-header">
-      <span class="geo-title">📐 GeoGebra Classic</span>
-      <span id="geo-status" style="font-size:.65rem;font-family:'DM Mono',monospace;color:var(--muted);">caricamento...</span>
-      <button class="geo-btn" style="margin-left:auto" onclick="geoClear()">🗑 Pulisci</button>
+  <!-- GEOGEBRA -->
+  <aside class="geo-panel" id="geo-panel">
+    <div class="geo-hd">
+      <span class="geo-title">GeoGebra Classic</span>
+      <span id="geo-status" style="font-size:.6rem;font-family:var(--font-mono);color:var(--muted)">caricamento...</span>
+      <div class="geo-acts"><button class="geo-btn" onclick="geoClear()">Pulisci</button></div>
     </div>
     <div id="ggb-element" style="flex:1;min-height:0;"></div>
   </aside>
 </div>
 
+<!-- TWEAKS -->
+<div class="tweaks-panel" id="tweaks-panel">
+  <div class="tweaks-hd">Tweaks <em class="tweaks-x" onclick="hideTweaks()">✕</em></div>
+  <div class="twk-g">
+    <div class="twk-lbl">Tema</div>
+    <div class="theme-grid">
+      <button class="twk-btn on" id="th-obsidian" onclick="setTheme('obsidian',this)"><span class="th-swatch" style="background:#e8b84b"></span>Obsidian</button>
+      <button class="twk-btn" id="th-aurora" onclick="setTheme('aurora',this)"><span class="th-swatch" style="background:#a78bfa"></span>Aurora</button>
+      <button class="twk-btn" id="th-midnight" onclick="setTheme('midnight',this)"><span class="th-swatch" style="background:#38bdf8"></span>Midnight</button>
+      <button class="twk-btn" id="th-forest" onclick="setTheme('forest',this)"><span class="th-swatch" style="background:#4ade80"></span>Forest</button>
+      <button class="twk-btn" id="th-rose" onclick="setTheme('rose',this)"><span class="th-swatch" style="background:#f472b6"></span>Rose</button>
+      <button class="twk-btn" id="th-crimson" onclick="setTheme('crimson',this)"><span class="th-swatch" style="background:#f43f5e"></span>Crimson</button>
+      <button class="twk-btn" id="th-slate" onclick="setTheme('slate',this)"><span class="th-swatch" style="background:#94a3b8"></span>Slate</button>
+      <button class="twk-btn" id="th-parchment" onclick="setTheme('parchment',this)"><span class="th-swatch" style="background:#b5701a"></span>Pergamena</button>
+      <button class="twk-btn" id="th-latte" onclick="setTheme('latte',this)"><span class="th-swatch" style="background:#7c5c3a"></span>Latte</button>
+    </div>
+  </div>
+  <div class="twk-g">
+    <div class="twk-lbl">Dimensione testo</div>
+    <input type="range" class="twk-slider" min="12" max="18" value="14" step="1" oninput="setFz(this.value)" id="fz-slider">
+    <div class="twk-rlbl"><span>Piccolo</span><span>Grande</span></div>
+  </div>
+  <div class="twk-g">
+    <div class="twk-lbl">Pannello grafico</div>
+    <div class="twk-btns">
+      <button class="twk-btn on" id="geo-vis-btn" onclick="toggleGeo()">Visibile</button>
+      <button class="twk-btn" id="geo-hid-btn" onclick="toggleGeo()">Nascosto</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ═══ PROVIDERS — same pattern as Law game ═══
-const PROVIDERS={
-  groq:     {name:'Groq',         model:'llama-3.3-70b-versatile', placeholder:'gsk_...',    link:'console.groq.com',      url:'https://console.groq.com/keys'},
-  anthropic:{name:'Anthropic',    model:'claude-sonnet-4-20250514',placeholder:'sk-ant-...',link:'console.anthropic.com', url:'https://console.anthropic.com'},
-  openai:   {name:'OpenAI',       model:'gpt-4o',                  placeholder:'sk-...',     link:'platform.openai.com',   url:'https://platform.openai.com/api-keys'},
-  gemini:   {name:'Google Gemini',model:'gemini-1.5-pro',          placeholder:'AIza...',    link:'aistudio.google.com',   url:'https://aistudio.google.com/app/apikey'},
+/* ══════════════════════════════
+   TWEAKS PROTOCOL
+══════════════════════════════ */
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "obsidian",
+  "fontSize": 15
+}/*EDITMODE-END*/;
+
+window.addEventListener('message', e => {
+  if (e.data?.type === '__activate_edit_mode') showTweaks();
+  if (e.data?.type === '__deactivate_edit_mode') hideTweaks();
+});
+window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+
+function showTweaks() { document.getElementById('tweaks-panel').classList.add('on'); }
+function hideTweaks() {
+  document.getElementById('tweaks-panel').classList.remove('on');
+  window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*');
+}
+
+function setTheme(t, btn) {
+  document.documentElement.setAttribute('data-theme', t === 'obsidian' ? '' : t);
+  document.querySelectorAll('.twk-btn[id^="th-"]').forEach(b => b.classList.remove('on'));
+  document.getElementById('th-' + t)?.classList.add('on');
+  window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { theme: t } }, '*');
+}
+function setFz(v) {
+  document.documentElement.style.setProperty('--fz', v + 'px');
+  window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { fontSize: +v } }, '*');
+}
+let geoOn = true;
+function toggleGeo() {
+  geoOn = !geoOn;
+  const gp = document.getElementById('geo-panel');
+  gp.style.display = geoOn ? 'flex' : 'none';
+  const app = document.getElementById('app');
+  app.style.gridTemplateColumns = geoOn ? '216px 1fr 336px' : '216px 1fr';
+  document.getElementById('geo-vis-btn').classList.toggle('on', geoOn);
+  document.getElementById('geo-hid-btn').classList.toggle('on', !geoOn);
+}
+
+/* ══════════════════════════════
+   PROVIDERS
+══════════════════════════════ */
+const PROVIDERS = {
+  groq:     { name:'Groq',          model:'llama-3.3-70b-versatile',  placeholder:'gsk_...',    url:'https://console.groq.com/keys',            link:'console.groq.com' },
+  anthropic:{ name:'Anthropic',     model:'claude-sonnet-4-20250514', placeholder:'sk-ant-...', url:'https://console.anthropic.com',            link:'console.anthropic.com' },
+  openai:   { name:'OpenAI',        model:'gpt-4o',                   placeholder:'sk-...',     url:'https://platform.openai.com/api-keys',     link:'platform.openai.com' },
+  gemini:   { name:'Google Gemini', model:'gemini-1.5-pro',           placeholder:'AIza...',    url:'https://aistudio.google.com/app/apikey',   link:'aistudio.google.com' },
 };
-let provider='groq', apiKey='', currentTopic=null, chatHistory=[], lastFunction=null;
+let provider = 'groq', apiKey = '', currentTopic = null, chatHistory = [], savedChats = [];
 
-function selectProvider(p){
-  provider=p;
-  document.querySelectorAll('.prov-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+p).classList.add('active');
-  const info=PROVIDERS[p];
-  document.getElementById('prov-model').textContent='Modello: '+info.model;
-  document.getElementById('prov-link').innerHTML='Ottieni la chiave su <a href="'+info.url+'" target="_blank">'+info.link+'</a>';
-  document.getElementById('api-key-input').placeholder=info.placeholder;
+function selectProvider(p) {
+  provider = p;
+  document.querySelectorAll('.prov-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + p).classList.add('active');
+  const info = PROVIDERS[p];
+  document.getElementById('prov-model').textContent = 'Modello: ' + info.model;
+  document.getElementById('prov-link').innerHTML = 'Chiave su <a href="' + info.url + '" target="_blank">' + info.link + '</a>';
+  document.getElementById('api-key-input').placeholder = info.placeholder;
 }
 
-// ═══ callAI — all 4 providers (copied from Law game) ═══
-async function callAI(msgs,systemPrompt,maxTokens){
-  const p=PROVIDERS[provider];
-  if(provider==='anthropic'){
-    const body={model:p.model,max_tokens:maxTokens,messages:msgs};
-    if(systemPrompt)body.system=systemPrompt;
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
-    const d=await r.json();if(d.error)throw new Error(d.error.message);
-    if(d.stop_reason==='max_tokens')throw new Error('Risposta troncata. Riprova.');
-    return d.content?.find(b=>b.type==='text')?.text||'';
-  }
-  if(provider==='openai'){
-    const ms=systemPrompt?[{role:'system',content:systemPrompt},...msgs]:msgs;
-    const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:p.model,max_tokens:maxTokens,messages:ms})});
-    const d=await r.json();if(d.error)throw new Error(d.error.message);
-    return d.choices?.[0]?.message?.content||'';
-  }
-  if(provider==='gemini'){
-    const parts=[];if(systemPrompt)parts.push({text:'SYSTEM: '+systemPrompt+'\n\n'});
-    msgs.forEach(m=>parts.push({text:(m.role==='user'?'USER: ':'ASSISTANT: ')+m.content+'\n'}));
-    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+p.model+':generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts}],generationConfig:{maxOutputTokens:maxTokens}})});
-    const d=await r.json();if(d.error)throw new Error(d.error.message);
-    return d.candidates?.[0]?.content?.parts?.[0]?.text||'';
-  }
-  if(provider==='groq'){
-    const ms=systemPrompt?[{role:'system',content:systemPrompt},...msgs]:msgs;
-    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:p.model,max_tokens:maxTokens,messages:ms})});
-    const d=await r.json();if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
-    return d.choices?.[0]?.message?.content||'';
-  }
-  throw new Error('Provider sconosciuto');
+function toggleEye() {
+  const inp = document.getElementById('api-key-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
-// ═══ SYSTEM PROMPT — rewritten for accuracy ═══
-function buildSystemPrompt(){
-  const topicCtx = currentTopic
-    ? '\n\nTOPIC SELEZIONATO: ' + currentTopic + '. Concentra TUTTA la spiegazione su questo.'
-    : '';
-  return `Sei MateSolver, tutor di analisi matematica per 5° anno liceo scientifico italiano (Maturità).
-Usi gli appunti ORIGINALI dello studente (PDF 214,221,226,241,246,255,270,275,283,292).
-
-════════════════════════════════════════════════
-REGOLA ASSOLUTA N.1: MAI saltare un passaggio.
-Ogni calcolo va scritto per esteso, riga per riga.
-REGOLA ASSOLUTA N.2: Controlla sempre i calcoli prima di scrivere.
-REGOLA ASSOLUTA N.3: Usa \\( ... \\) per LaTeX inline, \\[ ... \\] per display.
-REGOLA ASSOLUTA N.4: Ogni step inizia con **Passo N — NOME:**
-REGOLA ASSOLUTA N.5: Alla fine scrivi **Risultato finale:** con il riepilogo.
-════════════════════════════════════════════════
-
-══ APPUNTI COMPLETI ══
-
-▸ INTERVALLI E INTORNI
-• [a;b] chiuso, ]a;b[ aperto, [a;b[ semi-aperto
-• Intorno completo: I(x₀)=]x₀-δ₁;x₀+δ₂[
-• Intorno circolare: δ₁=δ₂=δ → ]x₀-δ;x₀+δ[
-• Intorno destro I⁺(x₀)=]x₀;x₀+δ[, sinistro I⁻(x₀)=]x₀-δ;x₀[
-
-▸ FATTORIZZAZIONE — IDENTITÀ FONDAMENTALI (dai PDF)
-• A²-B² = (A+B)(A-B)
-• A²±2AB+B² = (A±B)²
-• A³-B³ = (A-B)(A²+AB+B²)
-• A³+B³ = (A+B)(A²-AB+B²)
-• RUFFINI: per fattorizzare P(x) con radice intera r, se P(r)=0:
-  Schema Ruffini: | coeff_n  coeff_(n-1) ... coeff_0
-              r → |    0     r·q_n      ...
-                  |  coeff_n   q_(n-1)  ... 0
-  Esempio: 2x²-x-1 con r=1: P(1)=2-1-1=0 ✓
-    | 2  -1  -1
-  1 | 0   2   1
-    | 2   1   0  → (x-1)(2x+1)
-
-▸ LIMITI IMMEDIATI
-• Se f continua in x₀: sostituire direttamente
-• Forma ∞/∞: raccogliere grado massimo al num. e den.
-  lim(x→∞) (ax^n+...)/(bx^n+...) = a/b
-  lim(x→∞) (ax^n+...)/(bx^m+...) = +∞ se n>m, 0 se n<m
-• costante/x^n → 0 per x→±∞
-
-▸ LIMITI 0/0 — PROCEDURA ESATTA
-1. Sostituire x=x₀ → verificare che si ottiene 0/0
-2. Fattorizzare NUMERATORE: Ruffini o identità
-3. Fattorizzare DENOMINATORE: Ruffini o identità
-4. Semplificare (x-x₀) che si annulla
-5. Sostituire di nuovo
-Esempi verificati:
-• lim(x→1)(x²-1)/(2x²-x-1): NUM=(x-1)(x+1), DEN=(x-1)(2x+1) → 2/3
-• lim(x→2)(x³-2x²+x-2)/(x²+x-6): NUM=(x-2)(x²+1), DEN=(x-2)(x+3) → 5/5=1
-
-▸ LIMITI NOTEVOLI (PDF 270) — questi 5 valgono solo per x→0:
-1. lim sin(x)/x = 1
-2. lim (1-cos x)/x = 0
-3. lim (1-cos x)/x² = 1/2
-4. lim ln(1+x)/x = 1
-5. lim (eˣ-1)/x = 1
-Tecnica: moltiplicare e dividere per ottenere la forma standard.
-Es: lim ln(1+x)/sin(3x) → moltiplicare per x/x e 3x/3x → [ln(1+x)/x]·[3x/sin(3x)]·(1/3) = 1·1·(1/3) = 1/3
-
-▸ FUNZIONI CONTINUE (PDF 283)
-f continua in x₀ ⟺ lim(x→x₀)f(x) = f(x₀)
-Discontinuità: se limite sinistro ≠ limite destro
-
-══════════════════════════════════════════
-STUDIO DI FUNZIONE — F.A.R.F COMPLETO
-══════════════════════════════════════════
-Quando l'utente chiede "studia f(x)=..." o "FARF" o "studio di funzione",
-esegui TUTTI E 6 I PASSI nell'ordine, senza saltarne nessuno.
-
-━━━ PASSO 1 — DOMINIO ━━━
-Funzione razionale y=N(x)/D(x):
-• Porre D(x) ≠ 0
-• Fattorizzare D(x) completamente
-• Elencare i valori esclusi
-• Scrivere D: ∀x∈ℝ\{valori esclusi}
-
-━━━ PASSO 2 — INTERSEZIONI CON GLI ASSI ━━━
-∩ ASSE x: porre y=0 → risolvere N(x)=0 (solo per x∈D)
-  Fattorizzare N(x), trovare tutte le radici, verificare x∈D
-∩ ASSE y: porre x=0 → calcolare f(0) SOLO SE 0∈D
-  Se 0∉D → "nessuna intersezione con l'asse y"
-
-━━━ PASSO 3 — STUDIO DEL SEGNO ━━━
-Trovare dove y≥0 (funzione positiva o nulla).
-Procedura OBBLIGATORIA:
-1. Fattorizzare completamente N(x) e D(x) se non già fatto
-2. Elencare TUTTI i valori critici in ordine crescente
-   (= zeri del num. + punti esclusi dal dominio)
-3. Costruire la tabella dei segni così:
-   Per ogni fattore (x-a): negativo per x<a, zero per x=a, positivo per x>a
-   Per fattori come x: negativo per x<0, zero per x=0, positivo per x>0
-4. Il segno di y = prodotto/quoziente dei segni riga per riga
-5. Concludere: y>0 per x∈... , y<0 per x∈...
-FORMATO TABELLA (testo, non LaTeX):
-  x    | -∞  ...  a  ...  b  ...  +∞
-  (x-a)|  -   -   0   +   +   +   +
-  (x-b)|  -   -   -   -   0   +   +
-  y    |  +   +  // -  //  0   +   +
-  (// = escluso dal dominio)
-
-━━━ PASSO 4 — SIMMETRIE ━━━
-Calcolare f(-x) e confrontare con f(x) e -f(x):
-• Se f(-x)=f(x) → PARI (simmetria rispetto asse y)
-• Se f(-x)=-f(x) → DISPARI (simmetria rispetto all'origine)
-• Altrimenti → né pari né dispari
-MOSTRARE i calcoli di f(-x) per esteso.
-
-━━━ PASSO 5 — ASINTOTI VERTICALI ━━━
-Per ogni punto c escluso dal dominio, calcolare:
-• lim(x→c⁺) f(x)
-• lim(x→c⁻) f(x)
-Se almeno uno = ±∞ → x=c è ASINTOTO VERTICALE
-Per determinare il segno del limite:
-• Sostituire il fattore (x-c) con un infinitesimo positivo (x→c⁺ → x-c=0⁺)
-• Valutare il segno di tutti gli altri fattori in c
-• Il segno finale = prodotto dei segni
-SCRIVERE ESPLICITAMENTE il calcolo del segno per ogni limite.
-
-━━━ PASSO 6 — ASINTOTI ORIZZONTALI / OBLIQUI ━━━
-Calcolare lim(x→+∞)f(x) e lim(x→-∞)f(x).
-CASO A — risultato finito L: → ASINTOTO ORIZZONTALE y=L
-  Si verifica quando grado(N) ≤ grado(D)
-  Se grado(N)=grado(D): L = coefficiente_guida(N) / coefficiente_guida(D)
-  Se grado(N)<grado(D): L = 0
-
-CASO B — risultato ∞: → cercare ASINTOTO OBLIQUO y=mx+q
-  STEP B1 — Calcolare m:
-    m = lim(x→±∞) f(x)/x = lim N(x)/(x·D(x))
-    Raccogliere grado massimo al num. e den., semplificare.
-    m esiste finito solo se grado(N) = grado(D)+1
-
-  STEP B2 — Calcolare q:
-    q = lim(x→±∞) [f(x) - m·x]
-    = lim [N(x) - m·x·D(x)] / D(x)
-    Espandere m·x·D(x), sottrarre da N(x), raccogliere grado max.
-
-  Scrivere: ASINTOTO OBLIQUO: y = mx + q
-
-IMPORTANTE: se grado(N) ≥ grado(D)+2, non esiste asintoto obliquo.
-Se grado(N) = grado(D), esiste solo asintoto orizzontale.
-
-━━━ CONCLUSIONE FARF ━━━
-Dopo il passo 6, scrivere un RIEPILOGO:
-**Riepilogo:**
-- Dominio: ...
-- ∩x: punti...  ∩y: punto... o "nessuna"
-- Segno: y>0 per... y<0 per...
-- Simmetrie: ...
-- Asintoti verticali: x=...
-- Asintoto orizzontale/obliquo: y=...
-- GeoGebra: f(x)=[formula semplificata per GeoGebra]
-
-Alla fine SEMPRE scrivere una riga:
-GeoGebra: f(x)=[formula con * per moltiplicazione, senza spazi]
-${topicCtx}`;
+/* ══════════════════════════════
+   AI CALL
+══════════════════════════════ */
+async function callAI(msgs, sys, maxTok) {
+  const p = PROVIDERS[provider];
+  if (provider === 'anthropic') {
+    const body = { model: p.model, max_tokens: maxTok, messages: msgs };
+    if (sys) body.system = sys;
+    const r = await fetch('https://api.anthropic.com/v1/messages', { method:'POST', headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}, body:JSON.stringify(body) });
+    const d = await r.json(); if (d.error) throw new Error(d.error.message);
+    return d.content?.find(b => b.type==='text')?.text || '';
+  }
+  if (provider === 'openai') {
+    const ms = sys ? [{role:'system',content:sys},...msgs] : msgs;
+    const r = await fetch('https://api.openai.com/v1/chat/completions', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey}, body:JSON.stringify({model:p.model,max_tokens:maxTok,messages:ms}) });
+    const d = await r.json(); if (d.error) throw new Error(d.error.message);
+    return d.choices?.[0]?.message?.content || '';
+  }
+  if (provider === 'gemini') {
+    const parts = []; if (sys) parts.push({text:'SYSTEM: '+sys+'\n\n'});
+    msgs.forEach(m => parts.push({text:(m.role==='user'?'USER: ':'ASSISTANT: ')+m.content+'\n'}));
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+p.model+':generateContent?key='+apiKey, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({contents:[{role:'user',parts}],generationConfig:{maxOutputTokens:maxTok}}) });
+    const d = await r.json(); if (d.error) throw new Error(d.error.message);
+    return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  }
+  const ms = sys ? [{role:'system',content:sys},...msgs] : msgs;
+  const r = await fetch('https://api.groq.com/openai/v1/chat/completions', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey}, body:JSON.stringify({model:p.model,max_tokens:maxTok,messages:ms}) });
+  const d = await r.json(); if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
+  return d.choices?.[0]?.message?.content || '';
 }
 
-// ═══ SETUP & START ═══
-const STORAGE_KEY='matesolver_v1';
-window.onload=function(){
-  try{
-    const s=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
-    if(s.provider)provider=s.provider;
-    if(s.apiKey){apiKey=s.apiKey;document.getElementById('api-key-input').value=apiKey;}
-  }catch(e){}
+/* ══════════════════════════════
+   SYSTEM PROMPT
+══════════════════════════════ */
+function buildSys() {
+  const tc = currentTopic ? '\n\nTOPIC: '+currentTopic+'. Concentra TUTTA la spiegazione su questo.' : '';
+  return `Sei MateSolver, tutor di analisi matematica per 5° anno liceo scientifico (Maturità).
+Usi gli appunti originali dello studente.
+
+REGOLE ASSOLUTE:
+1. MAI saltare un passaggio. Ogni calcolo scritto per esteso, riga per riga.
+2. Controlla i calcoli prima di rispondere.
+3. LaTeX: \\( ... \\) inline, \\[ ... \\] display.
+4. Ogni step: **Passo N — NOME:**
+5. Alla fine: **Risultato finale:** con riepilogo.
+6. Alla fine di ogni studio di funzione: GeoGebra: f(x)=[formula]
+
+INTERVALLI: [a;b] chiuso, ]a;b[ aperto. Intorno I(x₀)=]x₀-δ;x₀+δ[
+
+FATTORIZZAZIONE: A²-B²=(A+B)(A-B); (A±B)²; A³±B³; Ruffini per radici intere.
+
+LIMITI IMMEDIATI: sostituzione diretta se f continua. Forma ∞/∞: raccogliere grado max. costante/xⁿ→0.
+
+LIMITI 0/0: 1)sostituire→0/0 2)fattorizzare num 3)fattorizzare den 4)semplificare (x-x₀) 5)sostituire.
+
+LIMITI NOTEVOLI (solo x→0): sin(x)/x=1; (1-cos x)/x=0; (1-cos x)/x²=1/2; ln(1+x)/x=1; (eˣ-1)/x=1.
+
+STUDIO FARF COMPLETO — eseguire TUTTI E 6 I PASSI:
+PASSO 1 DOMINIO: DEN≠0, fattorizzare, D:ℝ∖{esclusi}
+PASSO 2 INTERSEZIONI: ∩x: y=0→num=0. ∩y: x=0 solo se 0∈D
+PASSO 3 SEGNO: tabella con tutti i fattori, valori critici in ordine, segno riga per riga
+PASSO 4 SIMMETRIE: calcolare f(-x), concludere pari/dispari/nessuna
+PASSO 5 AV: per ogni c∉D calcolare lim da dx e sx, determinare segno
+PASSO 6 AO/AH: lim→±∞. Se finito L→y=L oriz. Se ∞: m=lim f(x)/x, q=lim[f(x)-mx]. Scrivere y=mx+q.
+RIEPILOGO finale con tutti i risultati.${tc}`;
+}
+
+/* ══════════════════════════════
+   INIT
+══════════════════════════════ */
+const SK = 'matesolver_v3';
+window.onload = function() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SK) || '{}');
+    if (s.provider) provider = s.provider;
+    if (s.apiKey) { apiKey = s.apiKey; document.getElementById('api-key-input').value = apiKey; }
+    savedChats = JSON.parse(localStorage.getItem('ms_chats') || '[]');
+    const tw = JSON.parse(localStorage.getItem('ms_tw') || '{}');
+    if (tw.theme) setTheme(tw.theme, document.getElementById('th-' + tw.theme) || document.getElementById('th-obsidian'));
+    if (tw.fontSize) { document.getElementById('fz-slider').value = tw.fontSize; setFz(tw.fontSize); }
+  } catch(e) {}
   selectProvider(provider);
-  if(apiKey)launchMain();
+  if (apiKey) launchMain();
+  initGeo();
 };
 
-function startApp(){
-  const k=document.getElementById('api-key-input').value.trim();
-  if(!k){alert('Inserisci la tua API key.');return;}
-  apiKey=k;
-  if(document.getElementById('save-key-cb').checked){
-    try{localStorage.setItem(STORAGE_KEY,JSON.stringify({provider,apiKey}));}catch(e){}
-  }
+function startApp() {
+  const k = document.getElementById('api-key-input').value.trim();
+  if (!k) { alert('Inserisci la tua API key.'); return; }
+  apiKey = k;
+  if (document.getElementById('save-key-cb').checked)
+    try { localStorage.setItem(SK, JSON.stringify({provider, apiKey})); } catch(e) {}
   launchMain();
 }
 
-function launchMain(){
-  document.getElementById('screen-setup').style.display='none';
-  const m=document.getElementById('screen-main');
-  m.classList.add('visible');
-  document.getElementById('prov-badge').textContent=PROVIDERS[provider].name+' · '+PROVIDERS[provider].model;
+function launchMain() {
+  const ob = document.getElementById('onboarding');
+  ob.classList.add('hidden');
+  setTimeout(() => ob.style.display = 'none', 400);
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('prov-badge').textContent = PROVIDERS[provider].name + ' · ' + PROVIDERS[provider].model;
 }
 
-// ═══ UI HELPERS ═══
-function switchPanel(id,btn){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-'+id).classList.add('active');
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
+/* ══════════════════════════════
+   UI
+══════════════════════════════ */
+function switchPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
 }
 
-function selectTopic(btn,topic){
-  document.querySelectorAll('.topic-btn,.farf-step,.farf-complete-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  currentTopic=topic;
-  document.getElementById('topic-hint').innerHTML='Argomento: <b>'+topic+'</b>';
+function clearSidebarActive() {
+  document.querySelectorAll('.topic-btn, .farf-step, .farf-all-btn').forEach(b => b.classList.remove('active'));
+}
+
+function selectTopic(btn, topic) {
+  clearSidebarActive(); btn.classList.add('active');
+  currentTopic = topic;
+  setTopicBadge(topic);
   renderNotes(topic);
+  document.getElementById('farf-bar').style.width = '0%';
 }
 
-// ═══ NOTES ═══
-const NOTES={
-  'Intervalli e Intorni':[
-    {t:'Tipi di Intervalli',b:`<p>\\([a;b]\\) — chiuso (estremi inclusi ●)</p><p>\\(]a;b[\\) — aperto (estremi esclusi ○)</p><p>\\([a;b[\\) e \\(]a;b]\\) — semi-aperti</p><p>\\([a;+\\infty[\\), \\(]-\\infty;b]\\), \\(\\mathbb{R}=]-\\infty;+\\infty[\\)</p>`},
-    {t:'Intorno di x₀',b:`<p>\\(I(x_0)=]x_0-\\delta_1;x_0+\\delta_2[\\) — completo</p><p>\\(\\delta_1=\\delta_2\\) → intorno circolare</p><p>\\(I^+(x_0)=]x_0;x_0+\\delta[\\) — destro</p><p>\\(I^-(x_0)=]x_0-\\delta;x_0[\\) — sinistro</p>`}
-  ],
-  'Limiti Immediati':[
-    {t:'Sostituzione Diretta',b:`<p>\\(\\lim_{x\\to4}\\sqrt{x}(x^2-15)=2(1)=2\\)</p><p>\\(\\lim_{x\\to3}2(x^2+1)=20\\)</p><p>\\(\\lim_{x\\to-\\infty}\\frac{-2}{x^4}=0\\)</p>`},
-    {t:'Infinito — Raccogliere xⁿ',b:`<p>Raccogliere la potenza max di \\(x\\) al num. e den.</p><p>\\(\\frac{\\text{costante}}{x^n}\\to0\\) per \\(x\\to\\pm\\infty\\)</p>`}
-  ],
-  'Limiti 0/0 — Fattorizzazione':[
-    {t:'Identità (NB dagli appunti)',b:`<p>\\(A^2-B^2=(A+B)(A-B)\\)</p><p>\\(A^2\\pm2AB+B^2=(A\\pm B)^2\\)</p><p>\\(A^2+B^2+C^2\\pm2AB\\pm2AC\\pm2BC=(A\\pm B\\pm C)^2\\)</p>`},
-    {t:'Procedura 0/0',b:`<p>1. Sostituire → ottenere \\(\\tfrac{0}{0}\\)</p><p>2. Fattorizzare NUM (Ruffini / identità)</p><p>3. Fattorizzare DEN</p><p>4. Semplificare \\((x-x_0)\\)</p><p>5. Sostituire di nuovo</p><p style="margin-top:8px">Es: \\(\\lim_{x\\to1}\\frac{x^2-1}{2x^2-x-1}=\\frac{(x-1)(x+1)}{(2x+1)(x-1)}=\\frac{2}{3}\\)</p>`}
-  ],
-  'Limiti Notevoli':[
-    {t:'I 5 Limiti (PDF 270)',b:`<p>1. \\(\\lim_{x\\to0}\\frac{\\sin x}{x}=1\\)</p><p>2. \\(\\lim_{x\\to0}\\frac{1-\\cos x}{x}=0\\)</p><p>3. \\(\\lim_{x\\to0}\\frac{1-\\cos x}{x^2}=\\frac{1}{2}\\)</p><p>4. \\(\\lim_{x\\to0}\\frac{\\ln(1+x)}{x}=1\\)</p><p>5. \\(\\lim_{x\\to0}\\frac{e^x-1}{x}=1\\)</p>`},
-    {t:'Tecnica di Riconduzione',b:`<p>\\(\\lim_{x\\to0}\\frac{\\ln(1+x)}{\\sin3x}=\\frac{\\ln(1+x)}{x}\\cdot\\frac{x}{\\sin3x}=\\frac{1}{3}\\)</p><p>\\(\\lim_{x\\to0}\\frac{1-e^{2x}}{\\sin x}=-2\\)</p>`}
-  ],
-  'Funzioni Continue':[
-    {t:'Definizione',b:`<p>\\(f\\) continua in \\(x_0\\) se \\(\\lim_{x\\to x_0}f(x)=f(x_0)\\)</p>`},
-    {t:'Esempio Discontinuità',b:`<p>\\(y=\\begin{cases}x^3&x<1\\\\x+2&x\\geq1\\end{cases}\\)</p><p>\\(\\lim_{x\\to1^-}x^3=1\\neq3=\\lim_{x\\to1^+}(x+2)\\) → non continua</p>`}
-  ],
-  'Dominio':[{t:'Regole',b:`<p>Funzione razionale: DEN \\(\\neq0\\)</p><p>Es (PDF 292): \\(x^2-2x\\neq0\\Rightarrow D:\\mathbb{R}\\setminus\\{0;2\\}\\)</p>`}],
-  'Intersezioni con gli Assi':[{t:'Procedura',b:`<p><strong>∩x:</strong> \\(y=0\\) → NUM=0</p><p><strong>∩y:</strong> \\(x=0\\) solo se \\(0\\in D\\)</p><p>Es (PDF 292): \\(A(3;0),B(1;0),C(-1;0)\\)</p>`}],
-  'Studio del Segno':[{t:'Tabella dei Segni',b:`<p>1. Valori critici (zeri + punti esclusi)</p><p>2. Una riga per ogni fattore</p><p>3. Segno = prodotto dei segni</p>`}],
-  'Simmetrie':[{t:'Pari / Dispari',b:`<p>Pari: \\(f(-x)=f(x)\\)</p><p>Dispari: \\(f(-x)=-f(x)\\)</p><p>Es (PDF 275): \\(\\frac{4x+3}{x-1}\\) → né pari né dispari</p>`}],
-  'Asintoti Verticali':[{t:'Definizione',b:`<p>\\(x=c\\) A.V. se \\(\\lim_{x\\to c^\\pm}f(x)=\\pm\\infty\\)</p><p>Es (PDF 292): A.V.: \\(x=0\\) e \\(x=2\\)</p>`}],
-  'Asintoto Obliquo / Orizzontale':[
-    {t:'Orizzontale',b:`<p>Se \\(\\lim_{x\\to\\pm\\infty}f(x)=L\\) → \\(y=L\\)</p><p>Es (PDF 275): \\(\\lim\\frac{4x+3}{x-1}=4\\) → \\(y=4\\)</p>`},
-    {t:'Obliquo y=mx+q',b:`<p>\\(m=\\lim_{x\\to\\pm\\infty}\\frac{f(x)}{x}\\)</p><p>\\(q=\\lim_{x\\to\\pm\\infty}[f(x)-mx]\\)</p><p>Es (PDF 292): \\(m=1,\\;q=-5\\) → \\(y=x-5\\)</p>`}
-  ],
-  'FARF Completo':[
-    {t:'Schema 6 Passi',b:`<p>1. <b>Dominio</b></p><p>2. <b>Intersezioni assi</b></p><p>3. <b>Studio del segno</b></p><p>4. <b>Simmetrie</b></p><p>5. <b>Asintoti verticali</b></p><p>6. <b>Asintoti oriz./obliqui</b></p>`},
-    {t:'Esempio (PDF 292)',b:`<p>\\(y=\\frac{x^3-3x^2-x+3}{x^2-2x}\\)</p><p>D: \\(\\mathbb{R}\\setminus\\{0;2\\}\\)</p><p>∩x: A(3;0), B(1;0), C(-1;0)</p><p>A.V.: x=0 e x=2</p><p>A.Obl.: y=x-5 (m=1, q=-5)</p>`}
-  ]
-};
-
-function renderNotes(topic){
-  const secs=NOTES[topic]||[];
-  let html=`<div class="notes-title">${topic}</div><div class="notes-sub">Appunti dagli originali scritti a mano</div>`;
-  secs.forEach(s=>{
-    html+=`<div class="note-sec"><div class="note-sec-title">${s.t}</div><div class="note-card">${s.b}</div></div>`;
-  });
-  const el=document.getElementById('notes-content');
-  el.innerHTML=html;
-  renderMath(el);
+function selectFarf(btn, topic, step) {
+  clearSidebarActive(); btn.classList.add('active');
+  currentTopic = topic;
+  setTopicBadge(topic);
+  renderNotes(topic);
+  document.getElementById('farf-bar').style.width = (step === 0 ? 100 : Math.round(step/6*100)) + '%';
 }
 
-// ═══ SOLVER ═══
-function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendProblem();}}
-function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
+function setTopicBadge(topic) {
+  document.getElementById('topic-area').innerHTML =
+    `<div class="topic-badge">📌 ${esc(topic)} <em class="topic-clear" onclick="clearTopic()">✕</em></div>`;
+}
 
-async function sendProblem(){
-  const input=document.getElementById('problem-input');
-  const text=input.value.trim();
-  if(!text||!apiKey)return;
-  document.getElementById('welcome').style.display='none';
-  const btn=document.getElementById('send-btn');
-  btn.disabled=true;
-  input.value='';input.style.height='auto';
-  addMsg('user',text);
-  chatHistory.push({role:'user',content:text});
-  // Auto-detect FARF and highlight sidebar
-  const isFARF = /studia|farf|studio di funzione|\bsdf\b/i.test(text);
-  if(isFARF){
-    currentTopic='FARF Completo';
-    document.querySelector('.farf-complete-btn').classList.add('active');
-    document.getElementById('topic-hint').innerHTML='Argomento: <b>FARF Completo</b> (rilevato automaticamente)';
-  }
-  const fnMatch=text.match(/f\s*\(x\)\s*=\s*([^,\n]+)|y\s*=\s*([^,\n]+)/i);
-  if(fnMatch)lastFunction=(fnMatch[1]||fnMatch[2]).trim();
-  const tid=addTyping();
-  try{
-    const resp=await callAI(chatHistory,buildSystemPrompt(),4500);
+function clearTopic() {
+  currentTopic = null;
+  document.getElementById('topic-area').innerHTML = '';
+  clearSidebarActive();
+  document.getElementById('farf-bar').style.width = '0%';
+}
+
+function useChip(text) {
+  const ta = document.getElementById('prob-in');
+  ta.value = text; autoResize(ta); ta.focus();
+}
+
+/* HISTORY */
+function toggleHist() {
+  const p = document.getElementById('hist-panel');
+  const opening = !p.classList.contains('on');
+  p.classList.toggle('on', opening);
+  if (opening) renderHist();
+}
+function renderHist() {
+  const list = document.getElementById('hist-list');
+  if (!savedChats.length) { list.innerHTML = '<div class="hist-empty">Nessuna chat salvata</div>'; return; }
+  list.innerHTML = savedChats.slice().reverse().map((c, i) =>
+    `<div class="hist-item" onclick="loadChat(${savedChats.length-1-i})">
+       <div class="hist-q">${esc(c.preview)}</div>
+       <div class="hist-meta">${c.date} · ${c.msgs} messaggi</div>
+     </div>`).join('');
+}
+function saveChat() {
+  if (!chatHistory.length) return;
+  const first = chatHistory.find(m => m.role === 'user');
+  if (!first) return;
+  savedChats.push({ preview: first.content.slice(0,80), date: new Date().toLocaleDateString('it-IT'), msgs: chatHistory.length, history: [...chatHistory] });
+  if (savedChats.length > 30) savedChats.shift();
+  try { localStorage.setItem('ms_chats', JSON.stringify(savedChats)); } catch(e) {}
+}
+function loadChat(idx) {
+  chatHistory = [...savedChats[idx].history];
+  document.getElementById('msgs').innerHTML = '';
+  document.getElementById('welcome').style.display = 'none';
+  chatHistory.forEach(m => addMsg(m.role, m.content));
+  toggleHist();
+}
+function newChat() {
+  saveChat();
+  chatHistory = [];
+  document.getElementById('msgs').innerHTML = '';
+  document.getElementById('welcome').style.display = 'flex';
+}
+function exportChat() {
+  if (!chatHistory.length) return;
+  const txt = chatHistory.map(m => (m.role==='user'?'▸ Tu:\n':'▸ MateSolver:\n') + m.content).join('\n\n─────────────\n\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = 'MateSolver_' + Date.now() + '.txt';
+  a.click();
+}
+
+/* ══════════════════════════════
+   SOLVER
+══════════════════════════════ */
+function handleKey(e) { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendProblem(); } }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+
+async function sendProblem() {
+  const input = document.getElementById('prob-in');
+  const text = input.value.trim();
+  if (!text || !apiKey) return;
+  document.getElementById('welcome').style.display = 'none';
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true; input.value = ''; input.style.height = 'auto';
+  addMsg('user', text);
+  chatHistory.push({role:'user', content:text});
+
+  const isFarf = /studia|farf|studio di funzione|\bsdf\b/i.test(text);
+  if (isFarf) { currentTopic = 'FARF Completo'; document.querySelector('.farf-all-btn').classList.add('active'); setTopicBadge('FARF Completo'); document.getElementById('farf-bar').style.width='100%'; }
+
+  const tid = addTyping();
+  try {
+    const resp = await callAI(chatHistory, buildSys(), 4500);
     removeTyping(tid);
-    addMsg('ai',resp);
-    chatHistory.push({role:'assistant',content:resp});
-    // Auto-detect function and inject into GeoGebra
-    const autoFn = detectFunction(resp);
-    if (autoFn) { lastFunction = autoFn; geoAutoInject(autoFn); }
-    // Also inject asymptotes
+    addMsg('ai', resp);
+    chatHistory.push({role:'assistant', content:resp});
+    const fn = detectFn(resp);
+    if (fn) { geoAutoInject(fn); }
     autoInjectAsymptotes(resp);
-  }catch(err){
+  } catch(err) {
     removeTyping(tid);
     addErrMsg(err.message);
   }
-  btn.disabled=false;
+  btn.disabled = false;
   scrollBot();
 }
 
-function addMsg(role,text){
-  const msgs=document.getElementById('msgs');
-  const div=document.createElement('div');
-  div.className='msg '+role;
-  const content=role==='ai'?formatAI(text):esc(text);
-  div.innerHTML=`<div class="msg-label">${role==='user'?'✏ Tu':'🧮 MateSolver'}</div><div class="bubble">${content}</div>`;
+function addMsg(role, text) {
+  const msgs = document.getElementById('msgs');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const content = role==='ai' ? formatAI(text) : esc(text);
+  div.innerHTML = `
+    <div class="msg-hd">
+      <div class="msg-av">${role==='user'?'T':'∫'}</div>
+      <span class="msg-lbl">${role==='user'?'Tu':'MateSolver'}</span>
+      ${role==='ai'?`<div class="msg-acts"><button class="act-btn" onclick="copyMsg(this)" title="Copia">⎘</button></div>`:''}
+    </div>
+    <div class="bubble">${content}</div>`;
   msgs.appendChild(div);
-  if(role==='ai')renderMath(div);
+  if (role==='ai') renderMath(div);
   scrollBot();
 }
 
-function addTyping(){
-  const msgs=document.getElementById('msgs');
-  const id='t'+Date.now();
-  const div=document.createElement('div');
-  div.className='msg ai';div.id=id;
-  div.innerHTML='<div class="msg-label">🧮 MateSolver</div><div class="bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
-  msgs.appendChild(div);scrollBot();return id;
+function copyMsg(btn) {
+  const bubble = btn.closest('.msg').querySelector('.bubble');
+  navigator.clipboard.writeText(bubble.innerText).then(() => { btn.textContent='✓'; setTimeout(()=>btn.textContent='⎘',1600); });
 }
-function removeTyping(id){const e=document.getElementById(id);if(e)e.remove();}
-function addErrMsg(msg){
-  const msgs=document.getElementById('msgs');
-  const div=document.createElement('div');
-  div.className='msg ai';
-  div.innerHTML='<div class="msg-label">⚠ Errore</div><div class="bubble"><div class="error-box">'+esc(msg)+'</div></div>';
+
+function addTyping() {
+  const msgs = document.getElementById('msgs');
+  const id = 't' + Date.now();
+  const div = document.createElement('div');
+  div.className = 'msg ai'; div.id = id;
+  div.innerHTML = '<div class="msg-hd"><div class="msg-av">∫</div><span class="msg-lbl">MateSolver</span></div><div class="bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
+  msgs.appendChild(div); scrollBot(); return id;
+}
+function removeTyping(id) { const e=document.getElementById(id); if(e) e.remove(); }
+function addErrMsg(msg) {
+  const msgs = document.getElementById('msgs');
+  const div = document.createElement('div'); div.className='msg ai';
+  div.innerHTML = '<div class="msg-hd"><div class="msg-av" style="color:var(--red)">!</div><span class="msg-lbl">Errore</span></div><div class="bubble"><div class="error-box">'+esc(msg)+'</div></div>';
   msgs.appendChild(div);
 }
-function scrollBot(){const c=document.getElementById('chat-scroll');setTimeout(()=>c.scrollTop=c.scrollHeight,50);}
+function scrollBot() { const c=document.getElementById('chat-scroll'); setTimeout(()=>c.scrollTop=c.scrollHeight,50); }
 
-// Format AI response: **Passo N** → step blocks
-function formatAI(text){
-  let h=esc(text);
-  h=h.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
-  // Step blocks
-  const stepRe=/(<strong>Passo\s+\d+[^<]*<\/strong>:?)/g;
-  const parts=h.split(stepRe);
-  if(parts.length>1){
-    let out=parts[0];
-    for(let i=1;i<parts.length;i++){
-      if(stepRe.test(parts[i])||/<strong>Passo/.test(parts[i])){
-        if(i>1)out+='</div>';
-        out+='<div class="step"><div class="step-n">'+parts[i]+'</div>';
-      } else {
-        out+=parts[i];
-      }
+function formatAI(text) {
+  let h = esc(text);
+  h = h.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  const parts = h.split(/(<strong>Passo\s+\d+[^<]*<\/strong>:?)/g);
+  if (parts.length > 1) {
+    let out = parts[0], inStep = false;
+    for (let i=1; i<parts.length; i++) {
+      if (/<strong>Passo/.test(parts[i])) { if (inStep) out+='</div>'; out+='<div class="step"><div class="step-lbl">'+parts[i]+'</div>'; inStep=true; }
+      else out += parts[i];
     }
-    if(parts.length>1)out+='</div>';
-    h=out;
+    if (inStep) out += '</div>';
+    h = out;
   }
-  h=h.replace(/(<strong>Risultato[^<]*<\/strong>[^\n<]*)/g,'<div class="result-box">$1</div>');
-  h=h.replace(/\n/g,'<br>');
+  h = h.replace(/(<strong>Risultato[^<]*<\/strong>[^\n<]*)/g,'<div class="result-box">$1</div>');
+  h = h.replace(/\n/g,'<br>');
   return h;
 }
-function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-function renderMath(el){
-  function go(){if(window.renderMathInElement)renderMathInElement(el,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false},{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});}
-  window._katexReady?go():setTimeout(go,600);
+function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function renderMath(el) {
+  const go = () => { if (window.renderMathInElement) renderMathInElement(el,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false},{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false}); };
+  window._katexReady ? go() : setTimeout(go,600);
 }
 
-// ═══ GEOGEBRA API (auto-inject) ═══
-let ggbReady = false;
-let ggbQueue = [];
-
-function initGeoGebra() {
-  const params = {
-    appName: 'classic',
-    width: '100%',
-    height: '100%',
-    showToolBar: true,
-    showAlgebraInput: true,
-    showMenuBar: false,
-    language: 'it',
-    id: 'ggb',
-    appletOnLoad: function() {
-      ggbReady = true;
-      document.getElementById('geo-status').textContent = 'pronto';
-      document.getElementById('geo-status').style.color = 'var(--green)';
-      // flush queue
-      ggbQueue.forEach(cmd => window.ggb && window.ggb.evalCommand(cmd));
-      ggbQueue = [];
-    }
-  };
-  const applet = new GGBApplet(params, true);
-  applet.inject('ggb-element');
+/* ══════════════════════════════
+   GEOGEBRA
+══════════════════════════════ */
+let ggbReady=false, ggbQ=[];
+function initGeo() {
+  try {
+    new GGBApplet({appName:'classic',width:'100%',height:'100%',showToolBar:false,showAlgebraInput:true,showMenuBar:false,enableRightClick:false,enableShiftDragZoom:true,useBrowserForJS:false,allowStyleBar:false,appletOnLoad:()=>{ggbReady=true;document.getElementById('geo-status').textContent='pronto';ggbQ.forEach(f=>f());ggbQ=[];}},true).inject('ggb-element');
+  } catch(e) { document.getElementById('geo-status').textContent='non disponibile'; }
 }
-
-// Auto-called after every AI response
-function geoAutoInject(fnExpr) {
-  if (!fnExpr) return;
-  // Clean up expression for GeoGebra
-  let expr = fnExpr
-    .replace(/×/g, '*').replace(/÷/g, '/')
-    .replace(/π/g, 'pi').replace(/√/g, 'sqrt')
-    .replace(/\^/g, '^').trim();
-  // Use a fresh name each time so multiple functions accumulate
-  const label = 'f(x)';
-  const cmd = label + '=' + expr;
-  if (ggbReady && window.ggb) {
-    try { window.ggb.evalCommand(cmd); } catch(e) {}
-  } else {
-    ggbQueue.push(cmd);
-  }
-  document.getElementById('geo-status').textContent = 'f(x)=' + expr.slice(0,20) + (expr.length > 20 ? '…' : '');
-  document.getElementById('geo-status').style.color = 'var(--accent)';
-}
-
-function geoClear() {
-  if (ggbReady && window.ggb) {
-    window.ggb.newConstruction();
-    document.getElementById('geo-status').textContent = 'pulito';
-    document.getElementById('geo-status').style.color = 'var(--muted)';
-  }
-}
-
-window.addEventListener('load', function() {
-  if (typeof GGBApplet !== 'undefined') initGeoGebra();
-  else setTimeout(initGeoGebra, 1500);
-});
-
-// ═══ MATH KEYBOARD ═══
-function toggleKbd(){
-  const w=document.getElementById('kbd-wrap');
-  const t=document.getElementById('kbd-toggle');
-  const open=w.classList.toggle('open');
-  t.classList.toggle('open',open);
-  if(open)document.getElementById('problem-input').focus();
-}
-
-function kbdTab(btn,page){
-  document.querySelectorAll('.kbd-tab').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.kbd-page').forEach(p=>p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('kp-'+page).classList.add('active');
-}
-
-function ki(val){
-  const el=document.getElementById('problem-input');
-  el.focus();
-  const s=el.selectionStart, e=el.selectionEnd;
-  const cur=el.value;
-  el.value=cur.slice(0,s)+val+cur.slice(e);
-  const pos=s+val.length;
-  el.setSelectionRange(pos,pos);
-  autoResize(el);
-}
-
-function kbsDel(){
-  const el=document.getElementById('problem-input');
-  el.focus();
-  const s=el.selectionStart, e=el.selectionEnd;
-  if(s!==e){el.value=el.value.slice(0,s)+el.value.slice(e);el.setSelectionRange(s,s);}
-  else if(s>0){el.value=el.value.slice(0,s-1)+el.value.slice(s);el.setSelectionRange(s-1,s-1);}
-  autoResize(el);
-}
-
-function kbsMove(dir){
-  const el=document.getElementById('problem-input');
-  el.focus();
-  const p=el.selectionStart+dir;
-  el.setSelectionRange(p,p);
-}
-
-// ═══ FUNCTION DETECTION ═══
-function detectFunction(text) {
-  const patterns = [
-    /GeoGebra[:\s]*f\(x\)=([^\n,]+)/i,
-    /GeoGebra[:\s]*f\(x\)\s*=\s*([^\n,]+)/i,
-    /studia\s+f\(x\)\s*=\s*([^,\n;]+)/i,
-    /studiamo\s+f\(x\)\s*=\s*([^,\n;]+)/i,
-    /f\(x\)\s*=\s*([^,\n;\\]+)/i,
-    /y\s*=\s*([^,\n;(\\]{3,60})/i,
-  ];
-  for (const p of patterns) {
-    const m = text.match(p);
-    if (m) {
-      let fn = m[1].trim()
-        .replace(/\\[a-zA-Z]+/g,'').replace(/[\[\]{}]/g,'')
-        .replace(/\s+/g,'');
-      if (fn.length > 2 && fn.length < 100 && fn.includes('x')) return fn;
-    }
-  }
-  return null;
-}
-
+function geoCmd(cmd) { if (ggbReady && window.ggbApp) try{ggbApp.evalCommand(cmd);}catch(e){} else ggbQ.push(()=>geoCmd(cmd)); }
+function geoClear() { geoCmd('DeleteAll[]'); }
+function geoAutoInject(fn) { geoClear(); geoCmd('f(x)=' + fn); }
+function detectFn(text) { const m=text.match(/GeoGebra:\s*f\(x\)\s*=\s*([^\n<]+)/i); return m?m[1].trim():null; }
 function autoInjectAsymptotes(text) {
-  if (!ggbReady || !window.ggb) return;
-  let cmdIdx = 0;
-  // Vertical asymptotes x=c
-  const avRe = /[Aa]sintot[oi]\s+[Vv]ertic[ae][li][^:]*:\s*x\s*=\s*([\d.\-\/]+)/g;
-  let m;
-  while ((m = avRe.exec(text)) !== null) {
-    try { window.ggb.evalCommand('av'+(cmdIdx++)+'=Line(x='+m[1]+')'); } catch(e){}
-    try { window.ggb.evalCommand('x='+m[1]); } catch(e){}
-  }
-  // Oblique asymptote y=mx+q
-  const aoRe = /[Aa]sintot[oi]\s+[Oo]bliqui[oa]?[^:]*:\s*y\s*=\s*([x\d.\-\+\*\/\s]+)/;
-  const ao = text.match(aoRe);
-  if (ao) {
-    try { window.ggb.evalCommand('g(x)='+ao[1].replace(/\s/g,'')); } catch(e){}
-  }
-  // Horizontal asymptote y=L
-  const ahRe = /[Aa]sintot[oi]\s+[Oo]rizzont[ae][li][^:]*:\s*y\s*=\s*([\d.\-]+)/;
-  const ah = text.match(ahRe);
-  if (ah) {
-    try { window.ggb.evalCommand('h(x)='+ah[1]); } catch(e){}
-  }
+  [...text.matchAll(/x\s*=\s*(-?\d+(?:[.,]\d+)?)/g)].forEach(m=>geoCmd('Line(('+m[1]+',0),('+m[1]+',1))'));
+  const ao=text.match(/y\s*=\s*(-?\d+(?:[.,]\d+)?\s*(?:\*?\s*x)?\s*[+-]?\s*-?\d*(?:[.,]\d+)?)/);
+  if (ao) try{geoCmd('g(x)='+ao[1].replace(/,/g,'.'))}catch(e){}
 }
 
-// init
-selectProvider('groq');
+/* ══════════════════════════════
+   KEYBOARD
+══════════════════════════════ */
+function toggleKbd() { document.getElementById('kbd-wrap').classList.toggle('on'); document.getElementById('kbd-tog').classList.toggle('on'); }
+function kbdTab(btn, pg) {
+  document.querySelectorAll('.kbd-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.kbd-pg').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active'); document.getElementById('kp-'+pg).classList.add('active');
+}
+function ki(s) { const ta=document.getElementById('prob-in'); const st=ta.selectionStart,en=ta.selectionEnd; ta.value=ta.value.slice(0,st)+s+ta.value.slice(en); ta.setSelectionRange(st+s.length,st+s.length); ta.focus(); autoResize(ta); }
+function kbsDel() { const ta=document.getElementById('prob-in'); const s=ta.selectionStart,e=ta.selectionEnd; if(s!==e)ta.value=ta.value.slice(0,s)+ta.value.slice(e); else if(s>0){ta.value=ta.value.slice(0,s-1)+ta.value.slice(s);ta.setSelectionRange(s-1,s-1);} autoResize(ta); }
+function kbsMove(d) { const ta=document.getElementById('prob-in'); const s=ta.selectionStart+d; ta.setSelectionRange(s,s); ta.focus(); }
+
+/* ══════════════════════════════
+   NOTES
+══════════════════════════════ */
+const NOTES = {
+  'Intervalli e Intorni':[
+    {t:'Tipi di Intervalli',b:`<p>\\([a;b]\\) — chiuso (estremi inclusi ●)</p><p>\\(]a;b[\\) — aperto (estremi esclusi ○)</p><p>\\([a;b[\\) e \\(]a;b]\\) — semi-aperti</p><p>\\(\\mathbb{R}=]-\\infty;+\\infty[\\)</p>`},
+    {t:'Intorno di x₀',b:`<p>\\(I(x_0)=]x_0-\\delta_1;x_0+\\delta_2[\\) — completo</p><p>\\(I^+(x_0)=]x_0;x_0+\\delta[\\) — destro</p><p>\\(I^-(x_0)=]x_0-\\delta;x_0[\\) — sinistro</p>`}
+  ],
+  'Limiti Immediati':[
+    {t:'Sostituzione Diretta',b:`<p>\\(\\lim_{x\\to4}\\sqrt{x}(x^2-15)=2(1)=2\\)</p><p>\\(\\lim_{x\\to-\\infty}\\frac{-2}{x^4}=0\\)</p>`},
+    {t:'Forma ∞/∞',b:`<p>Raccogliere la potenza max di \\(x\\) al num. e den.</p><p>\\(\\frac{\\text{cost}}{x^n}\\to0\\) per \\(x\\to\\pm\\infty\\)</p>`}
+  ],
+  'Limiti 0/0 — Fattorizzazione':[
+    {t:'Identità Fondamentali',b:`<p>\\(A^2-B^2=(A+B)(A-B)\\)</p><p>\\(A^2\\pm2AB+B^2=(A\\pm B)^2\\)</p><p>\\(A^3\\pm B^3=(A\\pm B)(A^2\\mp AB+B^2)\\)</p>`},
+    {t:'Procedura 0/0',b:`<p>1. Sostituire → ottenere \\(\\tfrac{0}{0}\\)</p><p>2. Fattorizzare NUM (Ruffini / identità)</p><p>3. Fattorizzare DEN</p><p>4. Semplificare \\((x-x_0)\\)</p><p>5. Sostituire di nuovo</p><p style="margin-top:8px">Es: \\(\\lim_{x\\to1}\\frac{x^2-1}{2x^2-x-1}=\\frac{(x-1)(x+1)}{(2x+1)(x-1)}=\\frac{2}{3}\\)</p>`}
+  ],
+  'Limiti Notevoli':[
+    {t:'I 5 Limiti (solo x→0)',b:`<p>1. \\(\\lim_{x\\to0}\\frac{\\sin x}{x}=1\\)</p><p>2. \\(\\lim_{x\\to0}\\frac{1-\\cos x}{x}=0\\)</p><p>3. \\(\\lim_{x\\to0}\\frac{1-\\cos x}{x^2}=\\frac{1}{2}\\)</p><p>4. \\(\\lim_{x\\to0}\\frac{\\ln(1+x)}{x}=1\\)</p><p>5. \\(\\lim_{x\\to0}\\frac{e^x-1}{x}=1\\)</p>`},
+    {t:'Tecnica di Riconduzione',b:`<p>\\(\\lim_{x\\to0}\\frac{\\ln(1+x)}{\\sin3x}=\\frac{\\ln(1+x)}{x}\\cdot\\frac{x}{\\sin3x}=\\frac{1}{3}\\)</p>`}
+  ],
+  'Funzioni Continue':[
+    {t:'Definizione',b:`<p>\\(f\\) continua in \\(x_0\\) se \\(\\lim_{x\\to x_0}f(x)=f(x_0)\\)</p>`},
+    {t:'Esempio Discontinuità',b:`<p>\\(y=\\begin{cases}x^3&x<1\\\\x+2&x\\geq1\\end{cases}\\)</p><p>\\(\\lim_{x\\to1^-}x^3=1\\neq3=\\lim_{x\\to1^+}(x+2)\\) — non continua</p>`}
+  ],
+  'Dominio':[{t:'Regole',b:`<p>Funzione razionale: DEN \\(\\neq0\\)</p><p>Es: \\(x^2-2x\\neq0\\Rightarrow D:\\mathbb{R}\\setminus\\{0;2\\}\\)</p>`}],
+  'Intersezioni con gli Assi':[{t:'Procedura',b:`<p><strong>∩x:</strong> \\(y=0\\) → NUM=0 (solo \\(x\\in D\\))</p><p><strong>∩y:</strong> \\(x=0\\) solo se \\(0\\in D\\)</p>`}],
+  'Studio del Segno':[{t:'Tabella dei Segni',b:`<p>1. Fattorizzare NUM e DEN</p><p>2. Valori critici in ordine crescente</p><p>3. Una riga per ogni fattore</p><p>4. Segno di \\(y\\) = prodotto dei segni</p>`}],
+  'Simmetrie':[{t:'Pari / Dispari',b:`<p>Calcolare \\(f(-x)\\):</p><p>Pari: \\(f(-x)=f(x)\\)</p><p>Dispari: \\(f(-x)=-f(x)\\)</p><p>Altrimenti: né pari né dispari</p>`}],
+  'Asintoti Verticali':[{t:'Definizione',b:`<p>\\(x=c\\) A.V. se \\(\\lim_{x\\to c^\\pm}f(x)=\\pm\\infty\\)</p><p>Es: A.V.: \\(x=0\\) e \\(x=2\\)</p>`}],
+  'Asintoto Obliquo / Orizzontale':[
+    {t:'Orizzontale',b:`<p>Se \\(\\lim_{x\\to\\pm\\infty}f(x)=L\\) → \\(y=L\\)</p>`},
+    {t:'Obliquo y=mx+q',b:`<p>\\(m=\\lim_{x\\to\\pm\\infty}\\frac{f(x)}{x}\\)</p><p>\\(q=\\lim_{x\\to\\pm\\infty}[f(x)-mx]\\)</p>`}
+  ],
+  'FARF Completo':[
+    {t:'Schema 6 Passi',b:`<p>1. <strong>Dominio</strong></p><p>2. <strong>Intersezioni assi</strong></p><p>3. <strong>Studio del segno</strong></p><p>4. <strong>Simmetrie</strong></p><p>5. <strong>Asintoti verticali</strong></p><p>6. <strong>Asintoti oriz./obliqui</strong></p>`},
+    {t:'Esempio',b:`<p>\\(y=\\frac{x^3-3x^2-x+3}{x^2-2x}\\)</p><p>D: \\(\\mathbb{R}\\setminus\\{0;2\\}\\)</p><p>∩x: \\((3;0),(1;0),(-1;0)\\)</p><p>A.V.: \\(x=0\\), \\(x=2\\)</p><p>A.Obl.: \\(y=x-5\\)</p>`}
+  ]
+};
+
+function renderNotes(topic) {
+  const secs = NOTES[topic] || [];
+  let html = `<div class="notes-title">${esc(topic)}</div><div class="notes-sub">Appunti dagli originali scritti a mano</div>`;
+  secs.forEach(s => { html += `<div class="note-sec"><div class="note-sec-t">${esc(s.t)}</div><div class="note-card">${s.b}</div></div>`; });
+  const el = document.getElementById('notes-content');
+  el.innerHTML = html;
+  renderMath(el);
+}
 </script>
 </body>
 </html>
